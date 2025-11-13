@@ -1,0 +1,16 @@
+{
+  "browser": {
+    "headless": false,
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+    "timeout": 30
+  },
+  "tasks": {
+    "default_wait_time": 5,
+    "auto_screenshot": true
+  },
+  "logging": {
+    "level": "info",
+    "file": "logs/auto-go.log",
+    "console": true
+  }
+}
