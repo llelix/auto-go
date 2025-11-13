@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .title }}</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #4285f4;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input[type="text"], 
+        input[type="email"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+        }
+        .checkbox-group input {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+        .btn {
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-right: 10px;
+        }
+        .btn:hover {
+            background-color: #3367d6;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .cookie-banner {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .cookie-banner button {
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .advanced-options {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 4px;
+            margin-top: 20px;
+            border: 1px dashed #6c757d;
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 5px;
+            cursor: help;
+            color: #6c757d;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 14px;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        .loading-indicator {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4285f4;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .success-message {
+            display: none;
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        .error-message {
+            display: none;
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        .help-text {
+            font-size: 14px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>复杂表单测试</h1>
+        <p>这个表单包含了更复杂的交互元素，用于测试auto-go的多种操作功能。</p>
+        
+        <!-- Cookie横幅 -->
+        <div id="cookieBanner" class="cookie-banner">
+            <div>
+                <strong>Cookie通知：</strong>我们使用Cookie来改善您的体验。
+            </div>
+            <div>
+                <button id="acceptCookies">接受所有Cookie</button>
+            </div>
+        </div>
+        
+        <form id="complexForm" action="/submit-complex-form" method="post">
+            <div class="form-group">
+                <label for="username">用户名</label>
+                <input type="text" id="username" name="username" placeholder="请输入用户名" required>
+                <div class="help-text">用户名应为4-20个字符，只能包含字母、数字和下划线</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">电子邮箱
+                    <span class="tooltip">ℹ️
+                        <span class="tooltiptext">我们将使用此邮箱向您发送确认信息</span>
+                    </span>
+                </label>
+                <input type="email" id="email" name="email" placeholder="请输入您的邮箱" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="country">国家</label>
+                <select id="country" name="country" required>
+                    <option value="">请选择国家</option>
+                    <option value="china">中国</option>
+                    <option value="usa">美国</option>
+                    <option value="japan">日本</option>
+                    <option value="uk">英国</option>
+                </select>
+            </div>
+            
+            <div class="form-group" id="stateGroup" style="display: none;">
+                <label for="state">省份/州</label>
+                <select id="state" name="state">
+                    <option value="">请先选择国家</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="agree-terms" name="agree-terms">
+                    <label for="agree-terms" style="margin-bottom: 0;">我同意服务条款和隐私政策</label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="show-advanced" name="show-advanced">
+                    <label for="show-advanced" style="margin-bottom: 0;">显示高级选项</label>
+                </div>
+            </div>
+            
+            <div id="advancedOptions" class="advanced-options" style="display: none;">
+                <h3>高级选项</h3>
+                <p>这些是表单的高级设置，通常情况下不需要修改。</p>
+                
+                <div class="form-group">
+                    <label for="theme">界面主题</label>
+                    <select id="theme" name="theme">
+                        <option value="default">默认</option>
+                        <option value="dark">深色</option>
+                        <option value="light">浅色</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <button type="submit" class="btn" id="submitBtn">提交表单</button>
+                <button type="button" class="btn btn-secondary" id="resetBtn">重置表单</button>
+                <a href="/" class="btn btn-secondary" style="text-decoration: none; display: inline-block;">返回首页</a>
+            </div>
+        </form>
+        
+        <div id="loadingIndicator" class="loading-indicator">
+            <div class="spinner"></div>
+            <p>正在提交表单，请稍候...</p>
+        </div>
+        
+        <div id="successMessage" class="success-message">
+            表单提交成功！感谢您的反馈。
+        </div>
+        
+        <div id="errorMessage" class="error-message">
+            提交失败，请检查表单内容并重试。
+        </div>
+    </div>
+    
+    <script>
+        // Cookie横幅处理
+        document.getElementById('acceptCookies').addEventListener('click', function() {
+            document.getElementById('cookieBanner').style.display = 'none';
+        });
+        
+        // 国家选择变化时加载对应的状态
+        document.getElementById('country').addEventListener('change', function() {
+            const country = this.value;
+            const stateGroup = document.getElementById('stateGroup');
+            const stateSelect = document.getElementById('state');
+            
+            if (country) {
+                stateGroup.style.display = 'block';
+                
+                // 加载对应国家的状态
+                fetch('/api/states/' + country)
+                    .then(response => response.json())
+                    .then(data => {
+                        stateSelect.innerHTML = '';
+                        
+                        if (data.states) {
+                            data.states.forEach(state => {
+                                const option = document.createElement('option');
+                                option.value = state;
+                                option.textContent = state;
+                                stateSelect.appendChild(option);
+                            });
+                        } else {
+                            const option = document.createElement('option');
+                            option.value = '';
+                            option.textContent = '无可用状态';
+                            stateSelect.appendChild(option);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading states:', error);
+                        stateSelect.innerHTML = '<option value="">加载失败</option>';
+                    });
+            } else {
+                stateGroup.style.display = 'none';
+                stateSelect.innerHTML = '<option value="">请先选择国家</option>';
+            }
+        });
+        
+        // 高级选项显示/隐藏
+        document.getElementById('show-advanced').addEventListener('change', function() {
+            const advancedOptions = document.getElementById('advancedOptions');
+            advancedOptions.style.display = this.checked ? 'block' : 'none';
+        });
+        
+        // 表单提交处理
+        document.getElementById('complexForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 显示加载指示器
+            document.getElementById('loadingIndicator').style.display = 'block';
+            
+            // 模拟表单提交延迟
+            setTimeout(function() {
+                const formData = new FormData(document.getElementById('complexForm'));
+                
+                fetch('/submit-complex-form', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('loadingIndicator').style.display = 'none';
+                    
+                    if (data.success) {
+                        document.getElementById('successMessage').style.display = 'block';
+                        document.getElementById('errorMessage').style.display = 'none';
+                        document.getElementById('complexForm').style.display = 'none';
+                        
+                        // 3秒后重定向到表单页面
+                        setTimeout(function() {
+                            window.location.href = '/complex-form';
+                        }, 3000);
+                    } else {
+                        document.getElementById('errorMessage').style.display = 'block';
+                        document.getElementById('successMessage').style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('loadingIndicator').style.display = 'none';
+                    document.getElementById('errorMessage').style.display = 'block';
+                    document.getElementById('successMessage').style.display = 'none';
+                    console.error('Error submitting form:', error);
+                });
+            }, 1000);
+        });
+        
+        // 重置表单
+        document.getElementById('resetBtn').addEventListener('click', function() {
+            document.getElementById('complexForm').reset();
+            document.getElementById('stateGroup').style.display = 'none';
+            document.getElementById('advancedOptions').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'none';
+        });
+    </script>
+</body>
+</html>

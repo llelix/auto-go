@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .title }}</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #4285f4;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input[type="text"], 
+        input[type="email"], 
+        input[type="tel"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 120px;
+            resize: vertical;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+        }
+        .checkbox-group input {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+        .btn {
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-right: 10px;
+        }
+        .btn:hover {
+            background-color: #3367d6;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .success-message {
+            display: none;
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>简单表单测试</h1>
+        <p>这是一个基本的表单测试页面，包含常见的表单元素。</p>
+        
+        <form id="simpleForm" action="/submit-form" method="post">
+            <div class="form-group">
+                <label for="name">姓名</label>
+                <input type="text" id="name" name="name" placeholder="请输入您的姓名" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">电子邮箱</label>
+                <input type="email" id="email" name="email" placeholder="请输入您的邮箱" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">电话号码</label>
+                <input type="tel" id="phone" name="phone" placeholder="请输入您的电话号码">
+            </div>
+            
+            <div class="form-group">
+                <label for="message">留言</label>
+                <textarea id="message" name="message" placeholder="请输入您的留言"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="agree-terms" name="agree-terms">
+                    <label for="agree-terms" style="margin-bottom: 0;">我同意服务条款和隐私政策</label>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <button type="submit" class="btn">提交表单</button>
+                <a href="/" class="btn btn-secondary" style="text-decoration: none; display: inline-block;">返回首页</a>
+            </div>
+        </form>
+        
+        <div id="successMessage" class="success-message">
+            表单提交成功！感谢您的反馈。
+        </div>
+    </div>
+    
+    <script>
+        // 表单提交成功后显示成功消息
+        document.getElementById('simpleForm').addEventListener('submit', function(e) {
+            // 实际应用中，这里应该通过AJAX提交表单
+            // 这里仅用于演示
+            // document.getElementById('successMessage').style.display = 'block';
+            // document.getElementById('simpleForm').style.display = 'none';
+        });
+    </script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-package operater
+package operator
 
 import (
 	"encoding/json"
@@ -14,29 +14,29 @@ import (
 type ActionType string
 
 const (
-	ActionClick        ActionType = "click"
-	ActionFill         ActionType = "fill"
-	ActionHover        ActionType = "hover"
-	ActionSelect       ActionType = "select"
-	ActionScroll       ActionType = "scroll"
-	ActionRightClick   ActionType = "right_click"
-	ActionDragDrop     ActionType = "drag_drop"
-	ActionWaitAppear   ActionType = "wait_appear"
+	ActionClick         ActionType = "click"
+	ActionFill          ActionType = "fill"
+	ActionHover         ActionType = "hover"
+	ActionSelect        ActionType = "select"
+	ActionScroll        ActionType = "scroll"
+	ActionRightClick    ActionType = "right_click"
+	ActionDragDrop      ActionType = "drag_drop"
+	ActionWaitAppear    ActionType = "wait_appear"
 	ActionWaitDisappear ActionType = "wait_disappear"
-	ActionGetText      ActionType = "get_text"
-	ActionGetAttribute ActionType = "get_attribute"
+	ActionGetText       ActionType = "get_text"
+	ActionGetAttribute  ActionType = "get_attribute"
 )
 
 // Action 定义单个元素操作
 type Action struct {
-	Type         ActionType      `json:"type"`
-	Selector     string          `json:"selector"`
-	Value        string          `json:"value,omitempty"`
-	Target       string          `json:"target,omitempty"` // 用于拖拽目标或其他需要第二个元素的场景
-	Attribute    string          `json:"attribute,omitempty"` // 用于获取属性
-	Timeout      int             `json:"timeout,omitempty"` // 超时时间(秒)，默认10秒
-	OutputKey    string          `json:"output_key,omitempty"` // 用于存储操作结果的键名
-	ErrorMessage string          `json:"error_message,omitempty"` // 自定义错误信息
+	Type         ActionType `json:"type"`
+	Selector     string     `json:"selector"`
+	Value        string     `json:"value,omitempty"`
+	Target       string     `json:"target,omitempty"`        // 用于拖拽目标或其他需要第二个元素的场景
+	Attribute    string     `json:"attribute,omitempty"`     // 用于获取属性
+	Timeout      int        `json:"timeout,omitempty"`       // 超时时间(秒)，默认10秒
+	OutputKey    string     `json:"output_key,omitempty"`    // 用于存储操作结果的键名
+	ErrorMessage string     `json:"error_message,omitempty"` // 自定义错误信息
 }
 
 // Task 定义自动化任务
@@ -123,55 +123,55 @@ func (tm *TaskManager) ExecuteTask(task Task) logger.TaskResult {
 func (tm *TaskManager) executeActions(actions []Action) error {
 	for i, action := range actions {
 		var err error
-		
+
 		switch action.Type {
 		case ActionClick:
 			err = tm.BrowserManager.Click(action.Selector)
-			
+
 		case ActionFill:
 			if action.Value == "" {
 				err = fmt.Errorf("fill操作需要提供value参数")
 			} else {
 				err = tm.BrowserManager.FillForm(map[string]string{action.Selector: action.Value})
 			}
-			
+
 		case ActionHover:
 			err = tm.BrowserManager.Hover(action.Selector)
-			
+
 		case ActionSelect:
 			if action.Value == "" {
 				err = fmt.Errorf("select操作需要提供value参数")
 			} else {
 				err = tm.BrowserManager.SelectOption(action.Selector, action.Value)
 			}
-			
+
 		case ActionScroll:
 			err = tm.BrowserManager.ScrollToElement(action.Selector)
-			
+
 		case ActionRightClick:
 			err = tm.BrowserManager.RightClick(action.Selector)
-			
+
 		case ActionDragDrop:
 			if action.Target == "" {
 				err = fmt.Errorf("drag_drop操作需要提供target参数")
 			} else {
 				err = tm.BrowserManager.DragAndDrop(action.Selector, action.Target)
 			}
-			
+
 		case ActionWaitAppear:
 			timeout := time.Duration(10) * time.Second
 			if action.Timeout > 0 {
 				timeout = time.Duration(action.Timeout) * time.Second
 			}
 			err = tm.BrowserManager.WaitForSelector(action.Selector, timeout)
-			
+
 		case ActionWaitDisappear:
 			timeout := time.Duration(10) * time.Second
 			if action.Timeout > 0 {
 				timeout = time.Duration(action.Timeout) * time.Second
 			}
 			err = tm.BrowserManager.WaitForElementDisappear(action.Selector, timeout)
-			
+
 		case ActionGetText:
 			text, getTextErr := tm.BrowserManager.GetText(action.Selector)
 			if getTextErr != nil {
@@ -184,7 +184,7 @@ func (tm *TaskManager) executeActions(actions []Action) error {
 					log.Printf("📋 文本已存储到键: %s", action.OutputKey)
 				}
 			}
-			
+
 		case ActionGetAttribute:
 			if action.Attribute == "" {
 				err = fmt.Errorf("get_attribute操作需要提供attribute参数")
@@ -201,22 +201,22 @@ func (tm *TaskManager) executeActions(actions []Action) error {
 					}
 				}
 			}
-			
+
 		default:
 			err = fmt.Errorf("不支持的操作类型: %s", action.Type)
 		}
-		
+
 		if err != nil {
 			if action.ErrorMessage != "" {
 				return fmt.Errorf("操作失败 [%d]: %s", i+1, action.ErrorMessage)
 			}
 			return fmt.Errorf("操作失败 [%d]: %s - %v", i+1, action.Type, err)
 		}
-		
+
 		// 操作间添加短暂延迟，提高执行稳定性
 		time.Sleep(500 * time.Millisecond)
 	}
-	
+
 	return nil
 }
 

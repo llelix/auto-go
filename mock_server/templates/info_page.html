@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .title }}</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #4285f4;
+            text-align: center;
+        }
+        .product-card {
+            display: flex;
+            margin: 20px 0;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .product-image {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+        }
+        .product-info {
+            flex: 1;
+            padding: 20px;
+        }
+        .product-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .product-price {
+            font-size: 20px;
+            color: #e53935;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .product-rating {
+            margin-bottom: 15px;
+        }
+        .rating-stars {
+            color: #FFC107;
+            margin-right: 5px;
+        }
+        .tabs {
+            display: flex;
+            margin-top: 30px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            background-color: #f5f5f5;
+            border: 1px solid #e0e0e0;
+            border-bottom: none;
+            margin-right: 5px;
+            border-radius: 4px 4px 0 0;
+            transition: background-color 0.3s ease;
+        }
+        .tab.active {
+            background-color: white;
+            border-bottom: 1px solid white;
+            margin-bottom: -1px;
+        }
+        .tab-content {
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-top: none;
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .attribute-list {
+            list-style: none;
+            padding: 0;
+        }
+        .attribute-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .attribute-list li:last-child {
+            border-bottom: none;
+        }
+        .attribute-name {
+            font-weight: bold;
+            width: 120px;
+            display: inline-block;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #4285f4;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #3367d6;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .hidden-content {
+            display: none;
+        }
+        .show-more-btn {
+            color: #4285f4;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 5px;
+            font-size: 14px;
+        }
+        .show-more-btn:hover {
+            text-decoration: underline;
+        }
+        .reviews-section {
+            margin-top: 30px;
+        }
+        .review {
+            border: 1px solid #f0f0f0;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+        .review-author {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .review-rating {
+            color: #FFC107;
+            margin-bottom: 10px;
+        }
+        .review-text {
+            margin-bottom: 10px;
+        }
+        .review-date {
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>信息获取测试</h1>
+        <p>这个页面包含各种元素，用于测试auto-go的文本获取和属性获取功能。</p>
+        
+        <div class="product-card">
+            <img src="https://picsum.photos/seed/product1/200/200.jpg" alt="产品图片" class="product-image" id="product-image">
+            <div class="product-info">
+                <h2 class="product-name" id="product-name">智能无线耳机</h2>
+                <div class="product-price" id="product-price">¥299.99</div>
+                <div class="product-rating" id="product-rating">
+                    <span class="rating-stars">★★★★☆</span>
+                    <span id="rating-value">4.2</span> (基于 156 条评价)
+                </div>
+                <p>高品质无线耳机，提供卓越的音质和舒适的佩戴体验。支持主动降噪和长达24小时的电池续航。</p>
+                <div class="attribute-list">
+                    <li><span class="attribute-name">品牌:</span> <span id="product-brand">TechSound</span></li>
+                    <li><span class="attribute-name">型号:</span> <span id="product-model">TS-2023</span></li>
+                    <li><span class="attribute-name">颜色:</span> <span id="product-color">深空灰</span></li>
+                    <li><span class="attribute-name">库存状态:</span> <span id="product-stock">有货</span></li>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" id="tab-description">产品详情</div>
+            <div class="tab" id="tab-specifications">技术规格</div>
+            <div class="tab" id="tab-reviews">用户评价</div>
+        </div>
+        
+        <div class="tab-content active" id="tab-content-description">
+            <h3>产品详情</h3>
+            <p>这款智能无线耳机采用最新的音频技术，为您提供卓越的听觉体验。无论是在日常通勤还是运动时，都能完美适应您的需求。</p>
+            
+            <p>主要特点包括：</p>
+            <ul>
+                <li>主动降噪技术，有效隔绝外界噪音</li>
+                <li>高清音频编码，支持无损音质</li>
+                <li>快速充电，15分钟充电可使用3小时</li>
+                <li>智能触控，简单直观的操作体验</li>
+            </ul>
+            
+            <p>耳机配有多种尺寸的耳塞，确保您能找到最适合自己的佩戴方式。</p>
+            
+            <button class="show-more-btn" id="show-more-btn">显示更多内容</button>
+            <div class="hidden-content" id="hidden-content">
+                <p>这款耳机还配备了先进的蓝牙5.3技术，确保稳定的连接和低延迟。支持多设备同时连接，您可以在手机、平板和电脑之间无缝切换。</p>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="tab-content-specifications">
+            <h3>技术规格</h3>
+            <div class="attribute-list">
+                <li><span class="attribute-name">驱动单元:</span> <span id="spec-driver">40mm动圈</span></li>
+                <li><span class="attribute-name">频率响应:</span> <span id="spec-frequency">20Hz - 20kHz</span></li>
+                <li><span class="attribute-name">阻抗:</span> <span id="spec-impedance">32Ω</span></li>
+                <li><span class="attribute-name">蓝牙版本:</span> <span id="spec-bluetooth">5.3</span></li>
+                <li><span class="attribute-name">电池续航:</span> <span id="spec-battery">24小时</span></li>
+                <li><span class="attribute-name">充电时间:</span> <span id="spec-charge-time">2小时</span></li>
+                <li><span class="attribute-name">防水等级:</span> <span id="spec-waterproof">IPX4</span></li>
+                <li><span class="attribute-name">重量:</span> <span id="spec-weight">250g</span></li>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="tab-content-reviews">
+            <h3>用户评价</h3>
+            
+            <div class="reviews-section" id="reviews-section">
+                <div class="review">
+                    <div class="review-author">张三</div>
+                    <div class="review-rating">★★★★★</div>
+                    <div class="review-text">音质非常好，降噪效果也很出色。长时间佩戴也很舒适，值得购买！</div>
+                    <div class="review-date">2023-10-15</div>
+                </div>
+                
+                <div class="review">
+                    <div class="review-author">李四</div>
+                    <div class="review-rating">★★★★☆</div>
+                    <div class="review-text">整体表现不错，但电池续航比预期的要短一些。不过音质确实很棒。</div>
+                    <div class="review-date">2023-09-28</div>
+                </div>
+                
+                <div class="review">
+                    <div class="review-author">王五</div>
+                    <div class="review-rating">★★★★★</div>
+                    <div class="review-text">连接稳定，没有出现断连问题。触控操作很灵敏，使用体验很好。</div>
+                    <div class="review-date">2023-09-10</div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px; text-align: center;">
+            <a href="/" class="btn">返回首页</a>
+        </div>
+    </div>
+    
+    <script>
+        // 标签切换功能
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                // 移除所有活动状态
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(tc => tc.classList.remove('active'));
+                
+                // 添加当前活动状态
+                this.classList.add('active');
+                const tabId = this.id.replace('tab-', 'tab-content-');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+        
+        // 显示更多内容功能
+        document.getElementById('show-more-btn').addEventListener('click', function() {
+            const hiddenContent = document.getElementById('hidden-content');
+            if (hiddenContent.style.display === 'block') {
+                hiddenContent.style.display = 'none';
+                this.textContent = '显示更多内容';
+            } else {
+                hiddenContent.style.display = 'block';
+                this.textContent = '隐藏内容';
+            }
+        });
+    </script>
+</body>
+</html>

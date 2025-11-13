@@ -7,8 +7,8 @@ import (
 
 	"github.com/mike/auto-go/config"
 	"github.com/mike/auto-go/internal/automation"
+	"github.com/mike/auto-go/internal/operator"
 	"github.com/mike/auto-go/internal/print"
-	"github.com/mike/auto-go/operater"
 	"github.com/urfave/cli/v2"
 )
 
@@ -79,7 +79,7 @@ func executeRunCommand(c *cli.Context) error {
 	}
 
 	// 加载任务
-	tasks, err := operater.LoadTasksFromFile(c.String("tasks"))
+	tasks, err := operator.LoadTasksFromFile(c.String("tasks"))
 	if err != nil {
 		return fmt.Errorf("加载任务失败: %w", err)
 	}
@@ -95,7 +95,7 @@ func executeRunCommand(c *cli.Context) error {
 
 	// 创建自动化执行器
 	auto := automation.New(appConfig, tasks, headless, chromePath)
-	
+
 	// 执行自动化任务
 	return auto.Execute()
 }
@@ -129,83 +129,83 @@ func getChromePath(c *cli.Context, appConfig *config.Config) string {
 
 // createSampleTasksFile 创建示例任务文件
 func createSampleTasksFile(tasksPath string) error {
-	sampleTasks := []operater.Task{
+	sampleTasks := []operator.Task{
 		{
-			Name: "示例任务 - 页面导航",
-			URL:  "https://example.com",
-			WaitTime: 3,
+			Name:       "示例任务 - 页面导航",
+			URL:        "https://example.com",
+			WaitTime:   3,
 			Screenshot: true,
-			Actions: []operater.Action{
+			Actions: []operator.Action{
 				{
-					Type: operater.ActionWaitAppear,
-					Selector: "h1",
-					Timeout: 5,
+					Type:         operator.ActionWaitAppear,
+					Selector:     "h1",
+					Timeout:      5,
 					ErrorMessage: "等待页面标题出现失败",
 				},
 				{
-					Type: operater.ActionGetText,
-					Selector: "h1",
-					OutputKey: "pageTitle",
+					Type:         operator.ActionGetText,
+					Selector:     "h1",
+					OutputKey:    "pageTitle",
 					ErrorMessage: "获取页面标题失败",
 				},
 			},
 		},
 		{
-			Name: "示例表单填写",
-			URL:  "https://example.org/form",
-			WaitTime: 5,
+			Name:       "示例表单填写",
+			URL:        "https://example.org/form",
+			WaitTime:   5,
 			Screenshot: true,
-			Actions: []operater.Action{
+			Actions: []operator.Action{
 				{
-					Type: operater.ActionWaitAppear,
-					Selector: "#agree-terms",
-					Timeout: 5,
+					Type:         operator.ActionWaitAppear,
+					Selector:     "#agree-terms",
+					Timeout:      5,
 					ErrorMessage: "等待同意条款复选框出现失败",
 				},
 				{
-					Type: operater.ActionClick,
-					Selector: "#agree-terms",
+					Type:         operator.ActionClick,
+					Selector:     "#agree-terms",
 					ErrorMessage: "点击同意条款复选框失败",
 				},
 				{
-					Type: operater.ActionFill,
-					Selector: "#name",
-					Value: "张三",
+					Type:         operator.ActionFill,
+					Selector:     "#name",
+					Value:        "张三",
 					ErrorMessage: "填写姓名失败",
 				},
 				{
-					Type: operater.ActionFill,
-					Selector: "#email",
-					Value: "zhangsan@example.com",
+					Type:         operator.ActionFill,
+					Selector:     "#email",
+					Value:        "zhangsan@example.com",
 					ErrorMessage: "填写邮箱失败",
 				},
 				{
-					Type: operater.ActionFill,
-					Selector: "#phone",
-					Value: "13800138000",
+					Type:         operator.ActionFill,
+					Selector:     "#phone",
+					Value:        "13800138000",
 					ErrorMessage: "填写电话失败",
 				},
 				{
-					Type: operater.ActionFill,
-					Selector: "#message",
-					Value: "这是一个测试消息",
+					Type:         operator.ActionFill,
+					Selector:     "#message",
+					Value:        "这是一个测试消息",
 					ErrorMessage: "填写消息失败",
 				},
 				{
-					Type: operater.ActionClick,
-					Selector: "#submit-btn",
+					Type:         operator.ActionClick,
+					Selector:     "#submit-btn",
 					ErrorMessage: "点击提交按钮失败",
 				},
 				{
-					Type: operater.ActionWaitAppear,
-					Selector: "#success-message",
-					Timeout: 10,
+					Type:         operator.ActionWaitAppear,
+					Selector:     "#success-message",
+					Timeout:      10,
 					ErrorMessage: "等待成功消息出现失败",
 				},
 			},
 		},
 	}
-	
+
 	file, err := os.Create(tasksPath)
 	if err != nil {
 		return fmt.Errorf("创建任务文件失败: %w", err)

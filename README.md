@@ -172,7 +172,7 @@ auto-go/
 ├── main.go                 # 主程序入口
 ├── config/                 # 配置管理模块
 │   └── config.go
-├── operater/               # 浏览器操作模块
+├── operator/               # 浏览器操作模块
 │   ├── browser.go
 │   └── task.go
 ├── internal/               # 内部工具模块
@@ -185,7 +185,7 @@ auto-go/
 
 ### 扩展自定义操作
 
-可以在 `operater/browser.go` 中添加新的浏览器操作方法：
+可以在 `operator/browser.go` 中添加新的浏览器操作方法：
 
 ```go
 // 示例：选择下拉框选项

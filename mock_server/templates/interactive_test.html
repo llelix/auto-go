@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .title }}</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #4285f4;
+            text-align: center;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #4285f4;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 5px;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #3367d6;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .btn-success {
+            background-color: #4CAF50;
+        }
+        .btn-success:hover {
+            background-color: #45a049;
+        }
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        .section h2 {
+            color: #333;
+            margin-top: 0;
+        }
+        .hidden-element {
+            display: none;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #e8f5e9;
+            border: 1px solid #a5d6a7;
+            border-radius: 4px;
+        }
+        .progress-container {
+            margin: 20px 0;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background-color: #f0f0f0;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #4285f4;
+            width: 0%;
+            transition: width 1s ease;
+            border-radius: 15px;
+        }
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #333;
+            font-weight: bold;
+        }
+        .loading-spinner {
+            display: none;
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #4285f4;
+            border-radius: 50%;
+            animation: spin 2s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .context-menu {
+            display: none;
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 8px 0;
+            z-index: 100;
+        }
+        .context-menu-item {
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .context-menu-item:hover {
+            background-color: #f0f0f0;
+        }
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+            margin: 0 10px;
+        }
+        .tooltip-target {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: help;
+            display: inline-block;
+        }
+        .tooltip-content {
+            visibility: hidden;
+            background-color: #333;
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip-container:hover .tooltip-content {
+            visibility: visible;
+            opacity: 1;
+        }
+        .element-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .list-item {
+            background-color: #e8eaf6;
+            color: #3f51b5;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .list-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .list-item.selected {
+            background-color: #3f51b5;
+            color: white;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 50%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>交互功能测试</h1>
+        <p>这个页面包含各种交互元素，用于测试auto-go的交互操作功能。</p>
+        
+        <div class="section">
+            <h2>点击与显示</h2>
+            <p>点击下面的按钮来显示隐藏的内容：</p>
+            <button id="show-hidden-btn" class="btn">显示隐藏内容</button>
+            <button id="toggle-content-btn" class="btn btn-secondary">切换内容</button>
+            
+            <div id="hidden-element" class="hidden-element">
+                <h3>这是隐藏的内容</h3>
+                <p>这段内容原本是隐藏的，点击按钮后显示出来。</p>
+                <button id="hide-content-btn" class="btn btn-secondary">隐藏内容</button>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>进度条测试</h2>
+            <p>点击下面的按钮开始加载过程：</p>
+            <button id="start-progress-btn" class="btn">开始加载</button>
+            <button id="reset-progress-btn" class="btn btn-secondary">重置进度</button>
+            
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                    <div class="progress-text" id="progress-text">0%</div>
+                </div>
+            </div>
+            
+            <div class="loading-spinner" id="loading-spinner"></div>
+        </div>
+        
+        <div class="section">
+            <h2>右键菜单</h2>
+            <p>在下面的区域右键点击，将显示自定义上下文菜单：</p>
+            <div id="context-menu-target" style="padding: 20px; background-color: #f5f5f5; border: 1px solid #ddd; border-radius: 4px;">
+                在此区域右键点击
+            </div>
+            
+            <div id="context-menu" class="context-menu">
+                <div class="context-menu-item" data-action="edit">编辑</div>
+                <div class="context-menu-item" data-action="copy">复制</div>
+                <div class="context-menu-item" data-action="paste">粘贴</div>
+                <div class="context-menu-item" data-action="delete">删除</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>悬停提示</h2>
+            <p>将鼠标悬停在下面的元素上，查看提示信息：</p>
+            
+            <div class="tooltip-container">
+                <div class="tooltip-target">悬停查看提示</div>
+                <div class="tooltip-content">这是一个悬停提示信息，用于测试auto-go的悬停功能。</div>
+            </div>
+            
+            <div class="tooltip-container">
+                <div class="tooltip-target">另一个提示</div>
+                <div class="tooltip-content">这是另一个提示信息，包含更多详细内容。</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>元素选择</h2>
+            <p>点击下面的元素来选择/取消选择：</p>
+            <div class="element-list" id="element-list">
+                <div class="list-item" data-id="1">选项 1</div>
+                <div class="list-item" data-id="2">选项 2</div>
+                <div class="list-item" data-id="3">选项 3</div>
+                <div class="list-item" data-id="4">选项 4</div>
+                <div class="list-item" data-id="5">选项 5</div>
+            </div>
+            
+            <button id="clear-selection-btn" class="btn btn-secondary">清除选择</button>
+            <button id="select-all-btn" class="btn btn-secondary">全选</button>
+            <button id="show-selection-btn" class="btn">显示选择</button>
+            
+            <div id="selected-items" class="hidden-element">
+                <h4>已选择的元素：</h4>
+                <div id="selected-list"></div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>模态对话框</h2>
+            <p>点击下面的按钮显示模态对话框：</p>
+            <button id="show-modal-btn" class="btn">显示模态对话框</button>
+            
+            <div id="modal" class="modal">
+                <div class="modal-content">
+                    <h3>模态对话框</h3>
+                    <p>这是一个模态对话框，用于测试对话框操作。</p>
+                    <button id="close-modal-btn" class="btn btn-secondary">关闭</button>
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px; text-align: center;">
+            <a href="/" class="btn">返回首页</a>
+        </div>
+    </div>
+    
+    <script>
+        // 显示/隐藏元素
+        document.getElementById('show-hidden-btn').addEventListener('click', function() {
+            document.getElementById('hidden-element').style.display = 'block';
+        });
+        
+        document.getElementById('hide-content-btn').addEventListener('click', function() {
+            document.getElementById('hidden-element').style.display = 'none';
+        });
+        
+        document.getElementById('toggle-content-btn').addEventListener('click', function() {
+            const element = document.getElementById('hidden-element');
+            if (element.style.display === 'block') {
+                element.style.display = 'none';
+            } else {
+                element.style.display = 'block';
+            }
+        });
+        
+        // 进度条功能
+        let progressInterval;
+        document.getElementById('start-progress-btn').addEventListener('click', function() {
+            if (progressInterval) return; // 防止多次点击
+            
+            const progressFill = document.getElementById('progress-fill');
+            const progressText = document.getElementById('progress-text');
+            const spinner = document.getElementById('loading-spinner');
+            
+            spinner.style.display = 'block';
+            let progress = 0;
+            
+            progressInterval = setInterval(function() {
+                progress += 5;
+                if (progress > 100) {
+                    progress = 100;
+                    clearInterval(progressInterval);
+                    progressInterval = null;
+                    spinner.style.display = 'none';
+                    
+                    // 显示完成消息
+                    setTimeout(function() {
+                        progressFill.style.backgroundColor = '#4CAF50';
+                        progressText.textContent = '完成!';
+                    }, 500);
+                }
+                
+                progressFill.style.width = progress + '%';
+                progressText.textContent = progress + '%';
+                
+                // 从API获取进度（在实际应用中）
+                // fetch('/api/progress?value=' + progress)
+                //     .then(response => response.json())
+                //     .then(data => {
+                //         if (data.status === 'completed') {
+                //             clearInterval(progressInterval);
+                //             progressInterval = null;
+                //             spinner.style.display = 'none';
+                //         }
+                //     })
+                //     .catch(error => console.error('Error:', error));
+            }, 300);
+        });
+        
+        document.getElementById('reset-progress-btn').addEventListener('click', function() {
+            if (progressInterval) {
+                clearInterval(progressInterval);
+                progressInterval = null;
+            }
+            
+            document.getElementById('progress-fill').style.width = '0%';
+            document.getElementById('progress-fill').style.backgroundColor = '#4285f4';
+            document.getElementById('progress-text').textContent = '0%';
+            document.getElementById('loading-spinner').style.display = 'none';
+        });
+        
+        // 右键菜单
+        const contextMenu = document.getElementById('context-menu');
+        const contextTarget = document.getElementById('context-menu-target');
+        
+        contextTarget.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            contextMenu.style.display = 'block';
+            contextMenu.style.left = e.pageX + 'px';
+            contextMenu.style.top = e.pageY + 'px';
+            
+            return false;
+        });
+        
+        document.addEventListener('click', function() {
+            contextMenu.style.display = 'none';
+        });
+        
+        document.querySelectorAll('.context-menu-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const action = this.getAttribute('data-action');
+                alert('执行操作: ' + action);
+                contextMenu.style.display = 'none';
+            });
+        });
+        
+        // 元素选择
+        document.querySelectorAll('.list-item').forEach(item => {
+            item.addEventListener('click', function() {
+                this.classList.toggle('selected');
+            });
+        });
+        
+        document.getElementById('clear-selection-btn').addEventListener('click', function() {
+            document.querySelectorAll('.list-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            document.getElementById('selected-items').style.display = 'none';
+        });
+        
+        document.getElementById('select-all-btn').addEventListener('click', function() {
+            document.querySelectorAll('.list-item').forEach(item => {
+                item.classList.add('selected');
+            });
+        });
+        
+        document.getElementById('show-selection-btn').addEventListener('click', function() {
+            const selectedItems = document.querySelectorAll('.list-item.selected');
+            const selectedItemsDiv = document.getElementById('selected-items');
+            const selectedList = document.getElementById('selected-list');
+            
+            selectedList.innerHTML = '';
+            
+            if (selectedItems.length > 0) {
+                selectedItems.forEach(item => {
+                    const id = item.getAttribute('data-id');
+                    const text = item.textContent;
+                    selectedList.innerHTML += `<div>ID: ${id}, 文本: ${text}</div>`;
+                });
+                selectedItemsDiv.style.display = 'block';
+            } else {
+                selectedItemsDiv.style.display = 'none';
+            }
+        });
+        
+        // 模态对话框
+        document.getElementById('show-modal-btn').addEventListener('click', function() {
+            document.getElementById('modal').style.display = 'block';
+        });
+        
+        document.getElementById('close-modal-btn').addEventListener('click', function() {
+            document.getElementById('modal').style.display = 'none';
+        });
+        
+        // 点击模态框外部关闭
+        window.addEventListener('click', function(e) {
+            const modal = document.getElementById('modal');
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .title }}</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #4285f4;
+            color: white;
+            border-radius: 8px;
+        }
+        .page-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .page-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .page-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .page-card h2 {
+            color: #4285f4;
+            margin-top: 0;
+        }
+        .page-card p {
+            margin-bottom: 20px;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #4285f4;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #3367d6;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Auto-Go Mock Server</h1>
+        <p>一个用于测试auto-go浏览器自动化工具的模拟服务器</p>
+    </div>
+    
+    <div class="page-grid">
+        <div class="page-card">
+            <h2>📝 简单表单测试</h2>
+            <p>基本的表单填写和提交功能测试，包括文本输入和复选框。</p>
+            <a href="/simple-form" class="btn">测试简单表单</a>
+        </div>
+        
+        <div class="page-card">
+            <h2>📋 复杂表单测试</h2>
+            <p>包含下拉选择、条件显示、多步骤提交等复杂交互的表单测试。</p>
+            <a href="/complex-form" class="btn">测试复杂表单</a>
+        </div>
+        
+        <div class="page-card">
+            <h2>🎯 拖拽功能测试</h2>
+            <p>测试元素拖拽功能，模拟拖放操作。</p>
+            <a href="/drag-and-drop" class="btn">测试拖拽功能</a>
+        </div>
+        
+        <div class="page-card">
+            <h2>ℹ️ 信息获取测试</h2>
+            <p>测试获取元素文本内容和属性值的功能。</p>
+            <a href="/info-page" class="btn">测试信息获取</a>
+        </div>
+        
+        <div class="page-card">
+            <h2>🎮 交互功能测试</h2>
+            <p>测试页面元素的动态交互，包括悬停、点击、等待等操作。</p>
+            <a href="/interactive-test" class="btn">测试交互功能</a>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>此Mock Server专为auto-go浏览器自动化工具设计，提供各种测试场景。</p>
+    </div>
+</body>
+</html>

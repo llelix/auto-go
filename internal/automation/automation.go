@@ -6,20 +6,20 @@ import (
 
 	"github.com/mike/auto-go/config"
 	"github.com/mike/auto-go/internal/logger"
+	"github.com/mike/auto-go/internal/operator"
 	"github.com/mike/auto-go/internal/print"
-	"github.com/mike/auto-go/operater"
 )
 
 // Automation 自动化执行器
 type Automation struct {
 	Config     *config.Config
-	Tasks      []operater.Task
+	Tasks      []operator.Task
 	Headless   bool
 	ChromePath string
 }
 
 // New 创建新的自动化执行器
-func New(cfg *config.Config, tasks []operater.Task, headless bool, chromePath string) *Automation {
+func New(cfg *config.Config, tasks []operator.Task, headless bool, chromePath string) *Automation {
 	return &Automation{
 		Config:     cfg,
 		Tasks:      tasks,
@@ -52,10 +52,10 @@ func (a *Automation) Execute() error {
 }
 
 // setupBrowser 设置浏览器
-func (a *Automation) setupBrowser() (*operater.BrowserManager, error) {
+func (a *Automation) setupBrowser() (*operator.BrowserManager, error) {
 	print.BrowserStart(a.Headless, a.ChromePath)
 
-	bm := operater.NewBrowserManager()
+	bm := operator.NewBrowserManager()
 	if err := bm.LaunchWithExecutable(a.Headless, a.ChromePath); err != nil {
 		return nil, fmt.Errorf("启动浏览器失败: %w", err)
 	}
@@ -65,15 +65,15 @@ func (a *Automation) setupBrowser() (*operater.BrowserManager, error) {
 }
 
 // cleanupBrowser 清理浏览器资源
-func (a *Automation) cleanupBrowser(bm *operater.BrowserManager) {
+func (a *Automation) cleanupBrowser(bm *operator.BrowserManager) {
 	if err := bm.Close(); err != nil {
 		fmt.Printf("⚠️  关闭浏览器失败: %v\n", err)
 	}
 }
 
 // executeTasks 执行所有任务
-func (a *Automation) executeTasks(bm *operater.BrowserManager) []logger.TaskResult {
-	tm := operater.NewTaskManager(bm)
+func (a *Automation) executeTasks(bm *operator.BrowserManager) []logger.TaskResult {
+	tm := operator.NewTaskManager(bm)
 	return tm.ExecuteTasks(a.Tasks)
 }
 
@@ -81,7 +81,7 @@ func (a *Automation) executeTasks(bm *operater.BrowserManager) []logger.TaskResu
 func (a *Automation) saveTaskResults(results []logger.TaskResult) {
 	resultFile := fmt.Sprintf("results_%s.json", time.Now().Format("20060102_150405"))
 
-	tm := &operater.TaskManager{}
+	tm := &operator.TaskManager{}
 	if err := tm.SaveTaskResults(results, resultFile); err != nil {
 		fmt.Printf("⚠️  保存任务结果失败: %v\n", err)
 	} else {

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .title }}</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #4285f4;
+            text-align: center;
+        }
+        .drag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 30px 0;
+            justify-content: space-around;
+        }
+        .drag-source, .drop-zone {
+            width: 150px;
+            height: 150px;
+            border: 2px dashed #4285f4;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: bold;
+            color: #4285f4;
+            cursor: grab;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+        .drag-source {
+            background-color: rgba(66, 133, 244, 0.1);
+        }
+        .drop-zone {
+            background-color: rgba(76, 175, 80, 0.1);
+            border-color: #4CAF50;
+            color: #4CAF50;
+        }
+        .drag-source.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+        .drop-zone.drag-over {
+            background-color: rgba(76, 175, 80, 0.3);
+            transform: scale(1.05);
+        }
+        .drop-zone.dropped {
+            background-color: rgba(76, 175, 80, 0.2);
+            border-style: solid;
+        }
+        .result-message {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #4285f4;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #3367d6;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .instructions {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .advanced-drag {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .item-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .draggable-item {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: grab;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+        .draggable-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .draggable-item.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+        .drop-target {
+            min-height: 100px;
+            background-color: #f5f5f5;
+            border: 1px dashed #ccc;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        .drop-target.drag-over {
+            background-color: #e8f5e9;
+            border-color: #4CAF50;
+        }
+        .drop-target .draggable-item {
+            margin: 5px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>拖拽功能测试</h1>
+        
+        <div class="instructions">
+            <p><strong>测试说明：</strong>拖拽左侧的元素到右侧的放置区域，测试auto-go的拖拽功能。</p>
+        </div>
+        
+        <h2>基本拖拽测试</h2>
+        <div class="drag-container">
+            <div class="drag-source" draggable="true" id="drag-source-1">拖拽元素 1</div>
+            <div class="drag-source" draggable="true" id="drag-source-2">拖拽元素 2</div>
+            <div class="drag-source" draggable="true" id="drag-source-3">拖拽元素 3</div>
+            
+            <div class="drop-zone" id="drop-zone-1">放置区域 1</div>
+            <div class="drop-zone" id="drop-zone-2">放置区域 2</div>
+        </div>
+        
+        <div id="result-message" class="result-message"></div>
+        
+        <div class="advanced-drag">
+            <h2>高级拖拽测试</h2>
+            <p>将下面的标签拖拽到框中，可以对它们进行排序和组织：</p>
+            
+            <div class="item-list" id="item-list">
+                <div class="draggable-item" draggable="true" data-value="urgent">紧急</div>
+                <div class="draggable-item" draggable="true" data-value="important">重要</div>
+                <div class="draggable-item" draggable="true" data-value="normal">普通</div>
+                <div class="draggable-item" draggable="true" data-value="low-priority">低优先级</div>
+                <div class="draggable-item" draggable="true" data-value="review">需要审核</div>
+            </div>
+            
+            <h3>优先级分类</h3>
+            <div class="drop-target" id="high-priority">
+                <strong>高优先级</strong>
+            </div>
+            
+            <div class="drop-target" id="normal-priority">
+                <strong>普通优先级</strong>
+            </div>
+            
+            <div class="drop-target" id="low-priority-target">
+                <strong>低优先级</strong>
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px; text-align: center;">
+            <a href="/" class="btn">返回首页</a>
+            <button id="reset-btn" class="btn btn-secondary">重置页面</button>
+        </div>
+    </div>
+    
+    <script>
+        // 基本拖拽功能
+        const dragSources = document.querySelectorAll('.drag-source');
+        const dropZones = document.querySelectorAll('.drop-zone');
+        const resultMessage = document.getElementById('result-message');
+        let draggedElement = null;
+        
+        dragSources.forEach(source => {
+            source.addEventListener('dragstart', function(e) {
+                draggedElement = this;
+                this.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/html', this.innerHTML);
+            });
+            
+            source.addEventListener('dragend', function() {
+                this.classList.remove('dragging');
+            });
+        });
+        
+        dropZones.forEach(zone => {
+            zone.addEventListener('dragover', function(e) {
+                if (e.preventDefault) {
+                    e.preventDefault();
+                }
+                e.dataTransfer.dropEffect = 'move';
+                this.classList.add('drag-over');
+                return false;
+            });
+            
+            zone.addEventListener('dragleave', function() {
+                this.classList.remove('drag-over');
+            });
+            
+            zone.addEventListener('drop', function(e) {
+                if (e.stopPropagation) {
+                    e.stopPropagation();
+                }
+                
+                this.classList.remove('drag-over');
+                
+                if (draggedElement && draggedElement !== this) {
+                    // 拖拽成功
+                    this.innerHTML = draggedElement.innerHTML;
+                    this.classList.add('dropped');
+                    
+                    resultMessage.textContent = `成功将 "${draggedElement.innerHTML}" 拖拽到放置区域 "${this.id}"`;
+                    resultMessage.className = 'result-message success';
+                    resultMessage.style.display = 'block';
+                    
+                    // 发送数据到服务器（在实际应用中）
+                    fetch('/drag-drop-success', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `source=${draggedElement.id}&target=${this.id}`
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Drag drop success:', data);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                    
+                    // 重置拖拽元素
+                    setTimeout(() => {
+                        draggedElement.style.visibility = 'hidden';
+                    }, 300);
+                }
+                
+                return false;
+            });
+        });
+        
+        // 高级拖拽功能
+        const draggableItems = document.querySelectorAll('.draggable-item');
+        const dropTargets = document.querySelectorAll('.drop-target');
+        let draggedItem = null;
+        
+        draggableItems.forEach(item => {
+            item.addEventListener('dragstart', function(e) {
+                draggedItem = this;
+                this.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/html', this.innerHTML);
+            });
+            
+            item.addEventListener('dragend', function() {
+                this.classList.remove('dragging');
+            });
+        });
+        
+        dropTargets.forEach(target => {
+            target.addEventListener('dragover', function(e) {
+                if (e.preventDefault) {
+                    e.preventDefault();
+                }
+                e.dataTransfer.dropEffect = 'move';
+                this.classList.add('drag-over');
+                return false;
+            });
+            
+            target.addEventListener('dragleave', function() {
+                this.classList.remove('drag-over');
+            });
+            
+            target.addEventListener('drop', function(e) {
+                if (e.stopPropagation) {
+                    e.stopPropagation();
+                }
+                
+                this.classList.remove('drag-over');
+                
+                if (draggedItem && draggedItem !== this) {
+                    // 创建拖拽项的副本并添加到目标区域
+                    const clonedItem = draggedItem.cloneNode(true);
+                    
+                    // 如果目标区域已经有内容，添加新项而不是替换
+                    this.appendChild(clonedItem);
+                    
+                    // 从原位置移除（可选）
+                    draggedItem.style.visibility = 'hidden';
+                }
+                
+                return false;
+            });
+        });
+        
+        // 重置按钮
+        document.getElementById('reset-btn').addEventListener('click', function() {
+            // 重置所有元素
+            document.querySelectorAll('.drag-source').forEach(source => {
+                source.style.visibility = 'visible';
+                source.classList.remove('dragging');
+            });
+            
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                zone.innerHTML = zone.id.replace('drop-zone-', '放置区域 ');
+                zone.classList.remove('dropped', 'drag-over');
+            });
+            
+            document.querySelectorAll('.draggable-item').forEach(item => {
+                item.style.visibility = 'visible';
+                item.classList.remove('dragging');
+            });
+            
+            // 重置目标区域
+            document.getElementById('high-priority').innerHTML = '<strong>高优先级</strong>';
+            document.getElementById('normal-priority').innerHTML = '<strong>普通优先级</strong>';
+            document.getElementById('low-priority-target').innerHTML = '<strong>低优先级</strong>';
+            
+            resultMessage.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
