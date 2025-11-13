@@ -28,11 +28,7 @@ go run main.go init
 
 这将创建默认的配置文件 `config.json` 和示例任务文件 `tasks.json`。
 
-### 3. 测试浏览器连接
 
-```bash
-go run main.go test --interactive
-```
 
 ### 4. 执行自动化任务
 

@@ -1,0 +1,10 @@
+[
+  {
+    "task_name": "测试百度搜索",
+    "success": false,
+    "error": "导航失败: 导航到 https://www.baidu.com 失败: Frame.Goto https://www.baidu.com: playwright: target closed: Target page, context or browser has been closed",
+    "start_time": "2025-11-13T17:28:07.5983352+08:00",
+    "end_time": "0001-01-01T00:00:00Z",
+    "duration": 0
+  }
+]

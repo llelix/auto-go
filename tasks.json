@@ -1,42 +1,12 @@
 [
   {
-    "name": "示例表单填写",
-    "url": "https://example.com/form",
-    "form_fields": {
-      "#name": "张三",
-      "#email": "zhangsan@example.com",
-      "#phone": "13800138000",
-      "#message": "这是一个测试消息"
-    },
-    "click_before": [
-      "#agree-terms"
-    ],
-    "click_after": [
-      "#submit-btn"
-    ],
-    "wait_time": 5,
-    "screenshot": true
-  },
-  {
     "name": "测试百度搜索",
     "url": "https://www.baidu.com",
     "form_fields": {
-      "#kw": "自动化测试"
+      "#chat-input-container": "自动化测试"
     },
     "click_after": [
       "#su"
-    ],
-    "wait_time": 3,
-    "screenshot": true
-  },
-  {
-    "name": "测试Google搜索",
-    "url": "https://www.google.com",
-    "form_fields": {
-      "input[name=q]": "Playwright 自动化测试"
-    },
-    "click_after": [
-      "input[name=btnK]"
     ],
     "wait_time": 3,
     "screenshot": true

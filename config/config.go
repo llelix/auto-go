@@ -18,9 +18,10 @@ type Config struct {
 
 // BrowserConfig 浏览器配置
 type BrowserConfig struct {
-	Headless  bool   `mapstructure:"headless" json:"headless"`
-	UserAgent string `mapstructure:"user_agent" json:"user_agent"`
-	Timeout   int    `mapstructure:"timeout" json:"timeout"`
+	Headless     bool   `mapstructure:"headless" json:"headless"`
+	UserAgent    string `mapstructure:"user_agent" json:"user_agent"`
+	Timeout      int    `mapstructure:"timeout" json:"timeout"`
+	ExecutablePath string `mapstructure:"executable_path" json:"executable_path"`
 }
 
 // TasksConfig 任务配置
@@ -40,9 +41,10 @@ type LoggingConfig struct {
 func DefaultConfig() *Config {
 	return &Config{
 		Browser: BrowserConfig{
-			Headless:  true,
-			UserAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-			Timeout:   30,
+			Headless:      true,
+			UserAgent:     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+			Timeout:       30,
+			ExecutablePath: "",
 		},
 		Tasks: TasksConfig{
 			DefaultWaitTime: 5,

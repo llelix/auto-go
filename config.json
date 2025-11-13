@@ -2,7 +2,8 @@
   "browser": {
     "headless": false,
     "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
-    "timeout": 30
+    "timeout": 30,
+    "executable_path": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
   },
   "tasks": {
     "default_wait_time": 5,

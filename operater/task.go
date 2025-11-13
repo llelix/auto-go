@@ -98,7 +98,7 @@ func (tm *TaskManager) ExecuteTask(task Task) TaskResult {
 			result.Error = fmt.Sprintf("创建截图目录失败: %v", err)
 			return result
 		}
-		
+
 		if err := tm.BrowserManager.Screenshot(screenshotFile); err != nil {
 			result.Success = false
 			result.Error = fmt.Sprintf("截图失败: %v", err)
@@ -114,27 +114,29 @@ func (tm *TaskManager) ExecuteTask(task Task) TaskResult {
 // ExecuteTasks 批量执行任务
 func (tm *TaskManager) ExecuteTasks(tasks []Task) []TaskResult {
 	var results []TaskResult
-	
+
 	for _, task := range tasks {
 		fmt.Printf("🚀 开始执行任务: %s\n", task.Name)
 		result := tm.ExecuteTask(task)
 		results = append(results, result)
-		
+
 		if result.Success {
 			fmt.Printf("✅ 任务完成: %s (耗时: %.2fs)\n", task.Name, result.Duration)
 		} else {
 			fmt.Printf("❌ 任务失败: %s - %s\n", task.Name, result.Error)
 		}
-		
+
 		// 任务间等待时间
 		time.Sleep(2 * time.Second)
 	}
-	
+
 	return results
 }
 
 // SaveTaskResults 保存任务结果到JSON文件
 func (tm *TaskManager) SaveTaskResults(results []TaskResult, filename string) error {
+	//保存到config指定的目录
+
 	file, err := os.Create(filename)
 	if err != nil {
 		return fmt.Errorf("创建结果文件失败: %w", err)
@@ -143,7 +145,7 @@ func (tm *TaskManager) SaveTaskResults(results []TaskResult, filename string) er
 
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "  ")
-	
+
 	if err := encoder.Encode(results); err != nil {
 		return fmt.Errorf("编码结果失败: %w", err)
 	}
@@ -161,7 +163,7 @@ func LoadTasksFromFile(filename string) ([]Task, error) {
 
 	var tasks []Task
 
-decoder := json.NewDecoder(file)
+	decoder := json.NewDecoder(file)
 	if err := decoder.Decode(&tasks); err != nil {
 		return nil, fmt.Errorf("解码任务文件失败: %w", err)
 	}
