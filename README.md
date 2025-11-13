@@ -72,22 +72,22 @@ go run main.go run --config custom-config.json --tasks my-tasks.json
 ```json
 [
   {
-    "name": "用户注册表单",
-    "url": "https://example.com/register",
-    "wait_time": 5,
+    "name": "简单表单测试",
+    "url": "http://localhost:8080/simple-form",
+    "wait_time": 3,
     "screenshot": true,
     "actions": [
       {
         "type": "wait_appear",
-        "selector": "#username",
+        "selector": "#name",
         "timeout": 5,
-        "error_message": "等待用户名输入框出现失败"
+        "error_message": "等待姓名输入框出现失败"
       },
       {
         "type": "fill",
-        "selector": "#username",
-        "value": "testuser",
-        "error_message": "填写用户名失败"
+        "selector": "#name",
+        "value": "测试用户",
+        "error_message": "填写姓名失败"
       },
       {
         "type": "fill",
@@ -97,28 +97,18 @@ go run main.go run --config custom-config.json --tasks my-tasks.json
       },
       {
         "type": "fill",
-        "selector": "#password",
-        "value": "securepassword123",
-        "error_message": "填写密码失败"
+        "selector": "#phone",
+        "value": "13800138000",
+        "error_message": "填写电话失败"
       },
       {
-        "type": "click",
-        "selector": "#agree-terms",
-        "error_message": "点击同意条款复选框失败"
-      },
-      {
-        "type": "click",
-        "selector": "#submit-btn",
-        "error_message": "点击提交按钮失败"
-      },
-      {
-        "type": "wait_appear",
-        "selector": "#success-message",
-        "timeout": 10,
-        "error_message": "等待成功消息出现失败"
+        "type": "fill",
+        "selector": "#message",
+        "value": "这是一个测试消息，用于验证auto-go的表单填写功能。",
+        "error_message": "填写消息失败"
       }
-    ]
-  }
+      ]
+    }
 ]
 ```
 

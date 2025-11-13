@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"encoding/json"
+	_ "embed"
 	"fmt"
 	"os"
 
@@ -115,96 +115,14 @@ func getChromePath(c *cli.Context, appConfig *config.Config) string {
 	return appConfig.Browser.ExecutablePath
 }
 
+//go:embed tasks_template.json
+var tasksTemplate string
+
 // createSampleTasksFile 创建示例任务文件
 func createSampleTasksFile(tasksPath string) error {
-	sampleTasks := []operator.Task{
-		{
-			Name:       "示例任务 - 页面导航",
-			URL:        "https://example.com",
-			WaitTime:   3,
-			Screenshot: true,
-			Actions: []operator.Action{
-				{
-					Type:         operator.ActionWaitAppear,
-					Selector:     "h1",
-					Timeout:      5,
-					ErrorMessage: "等待页面标题出现失败",
-				},
-				{
-					Type:         operator.ActionGetText,
-					Selector:     "h1",
-					OutputKey:    "pageTitle",
-					ErrorMessage: "获取页面标题失败",
-				},
-			},
-		},
-		{
-			Name:       "示例表单填写",
-			URL:        "https://example.org/form",
-			WaitTime:   5,
-			Screenshot: true,
-			Actions: []operator.Action{
-				{
-					Type:         operator.ActionWaitAppear,
-					Selector:     "#agree-terms",
-					Timeout:      5,
-					ErrorMessage: "等待同意条款复选框出现失败",
-				},
-				{
-					Type:         operator.ActionClick,
-					Selector:     "#agree-terms",
-					ErrorMessage: "点击同意条款复选框失败",
-				},
-				{
-					Type:         operator.ActionFill,
-					Selector:     "#name",
-					Value:        "张三",
-					ErrorMessage: "填写姓名失败",
-				},
-				{
-					Type:         operator.ActionFill,
-					Selector:     "#email",
-					Value:        "zhangsan@example.com",
-					ErrorMessage: "填写邮箱失败",
-				},
-				{
-					Type:         operator.ActionFill,
-					Selector:     "#phone",
-					Value:        "13800138000",
-					ErrorMessage: "填写电话失败",
-				},
-				{
-					Type:         operator.ActionFill,
-					Selector:     "#message",
-					Value:        "这是一个测试消息",
-					ErrorMessage: "填写消息失败",
-				},
-				{
-					Type:         operator.ActionClick,
-					Selector:     "#submit-btn",
-					ErrorMessage: "点击提交按钮失败",
-				},
-				{
-					Type:         operator.ActionWaitAppear,
-					Selector:     "#success-message",
-					Timeout:      10,
-					ErrorMessage: "等待成功消息出现失败",
-				},
-			},
-		},
-	}
-
-	file, err := os.Create(tasksPath)
-	if err != nil {
-		return fmt.Errorf("创建任务文件失败: %w", err)
-	}
-	defer file.Close()
-
-	encoder := json.NewEncoder(file)
-	encoder.SetIndent("", "  ")
-
-	if err := encoder.Encode(sampleTasks); err != nil {
-		return fmt.Errorf("编码任务文件失败: %w", err)
+	// 将嵌入的模板内容写入文件
+	if err := os.WriteFile(tasksPath, []byte(tasksTemplate), 0644); err != nil {
+		return fmt.Errorf("写入示例任务文件失败: %w", err)
 	}
 
 	return nil
