@@ -30,18 +30,6 @@ func CreateRunCommand() *cli.Command {
 				Usage:   "任务配置文件路径",
 				Value:   "tasks.json",
 			},
-			&cli.BoolFlag{
-				Name:    "interactive",
-				Aliases: []string{"i"},
-				Usage:   "交互模式，显示浏览器界面",
-				Value:   false,
-			},
-			&cli.StringFlag{
-				Name:    "chrome-path",
-				Aliases: []string{"cp"},
-				Usage:   "指定Chrome可执行文件路径",
-				Value:   "",
-			},
 		},
 		Action: executeRunCommand,
 	}

@@ -20,6 +20,7 @@ func CreateApp() *cli.App {
 		Commands: []*cli.Command{
 			CreateRunCommand(),
 			CreateInitCommand(),
+			CreateMockServerCommand(),
 		},
 	}
 }
