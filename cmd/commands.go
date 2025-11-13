@@ -7,8 +7,8 @@ import (
 
 	"github.com/mike/auto-go/config"
 	"github.com/mike/auto-go/internal/automation"
+	"github.com/mike/auto-go/internal/logger"
 	"github.com/mike/auto-go/internal/operator"
-	"github.com/mike/auto-go/internal/print"
 	"github.com/urfave/cli/v2"
 )
 
@@ -112,7 +112,7 @@ func executeInitCommand(c *cli.Context) error {
 		return fmt.Errorf("创建任务文件失败: %w", err)
 	}
 
-	print.InitSuccess(c.String("config"), c.String("tasks"))
+	logger.InitSuccess(c.String("config"), c.String("tasks"))
 	return nil
 }
 

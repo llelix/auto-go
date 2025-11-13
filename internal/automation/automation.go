@@ -7,7 +7,6 @@ import (
 	"github.com/mike/auto-go/config"
 	"github.com/mike/auto-go/internal/logger"
 	"github.com/mike/auto-go/internal/operator"
-	"github.com/mike/auto-go/internal/print"
 )
 
 // Automation 自动化执行器
@@ -30,7 +29,7 @@ func New(cfg *config.Config, tasks []operator.Task, headless bool, chromePath st
 
 // Execute 执行自动化任务
 func (a *Automation) Execute() error {
-	print.StartExecution(len(a.Tasks))
+	logger.StartExecution(len(a.Tasks))
 
 	// 创建和管理浏览器
 	bm, err := a.setupBrowser()
@@ -46,21 +45,21 @@ func (a *Automation) Execute() error {
 	a.saveTaskResults(results)
 
 	// 打印统计信息
-	print.TaskStatistics(results, len(a.Tasks))
+	logger.TaskStatistics(results, len(a.Tasks))
 
 	return nil
 }
 
 // setupBrowser 设置浏览器
 func (a *Automation) setupBrowser() (*operator.BrowserManager, error) {
-	print.BrowserStart(a.Headless, a.ChromePath)
+	logger.BrowserStart(a.Headless, a.ChromePath)
 
 	bm := operator.NewBrowserManager()
 	if err := bm.LaunchWithExecutable(a.Headless, a.ChromePath); err != nil {
 		return nil, fmt.Errorf("启动浏览器失败: %w", err)
 	}
 
-	print.BrowserSuccess()
+	logger.BrowserSuccess()
 	return bm, nil
 }
 
