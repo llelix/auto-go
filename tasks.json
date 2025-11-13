@@ -1,9 +1,9 @@
 [
   {
-    "name": "测试百度搜索",
-    "url": "https://www.baidu.com",
+    "name": "测试",
+    "url": "http://192.168.137.100:3000/manage/modeling-add?ds_id=ee488c4b1e514c90afa36139b25923f7&ds_name=company&model_type=table",
     "form_fields": {
-      "#chat-input-container": "自动化测试"
+      "#ant-input css-fob9pg ant-input-outlined": "自动化"
     },
     "click_after": [
       "#su"
@@ -12,3 +12,4 @@
     "screenshot": true
   }
 ]
+

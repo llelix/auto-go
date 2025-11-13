@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -135,9 +136,12 @@ func (tm *TaskManager) ExecuteTasks(tasks []Task) []TaskResult {
 
 // SaveTaskResults 保存任务结果到JSON文件
 func (tm *TaskManager) SaveTaskResults(results []TaskResult, filename string) error {
-	//保存到config指定的目录
+	//保存到logs目录下没有就创建
+	if err := os.MkdirAll("logs", os.ModePerm); err != nil {
+		return fmt.Errorf("创建logs目录失败: %w", err)
+	}
 
-	file, err := os.Create(filename)
+	file, err := os.Create(filepath.Join("logs", filename))
 	if err != nil {
 		return fmt.Errorf("创建结果文件失败: %w", err)
 	}
