@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/mike/auto-go/config"
+	"github.com/mike/auto-go/internal/logger"
 	"github.com/mike/auto-go/internal/print"
 	"github.com/mike/auto-go/operater"
 )
@@ -71,13 +72,13 @@ func (a *Automation) cleanupBrowser(bm *operater.BrowserManager) {
 }
 
 // executeTasks 执行所有任务
-func (a *Automation) executeTasks(bm *operater.BrowserManager) []operater.TaskResult {
+func (a *Automation) executeTasks(bm *operater.BrowserManager) []logger.TaskResult {
 	tm := operater.NewTaskManager(bm)
 	return tm.ExecuteTasks(a.Tasks)
 }
 
 // saveTaskResults 保存任务结果
-func (a *Automation) saveTaskResults(results []operater.TaskResult) {
+func (a *Automation) saveTaskResults(results []logger.TaskResult) {
 	resultFile := fmt.Sprintf("results_%s.json", time.Now().Format("20060102_150405"))
 
 	tm := &operater.TaskManager{}

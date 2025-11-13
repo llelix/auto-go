@@ -178,6 +178,182 @@ func (bm *BrowserManager) Screenshot(filename string) error {
 	return nil
 }
 
+// ScrollToElement 滚动到元素可见区域
+func (bm *BrowserManager) ScrollToElement(selector string) error {
+	if bm.Page == nil {
+		return fmt.Errorf("页面未初始化")
+	}
+
+	if err := bm.WaitForSelector(selector, 10*time.Second); err != nil {
+		return fmt.Errorf("等待元素 %s 失败: %w", selector, err)
+	}
+
+	// 滚动到元素位置
+	_, err := bm.Page.EvalOnSelector(selector, "element => element.scrollIntoView({behavior: 'smooth', block: 'center'})", nil)
+	if err != nil {
+		return fmt.Errorf("滚动到元素 %s 失败: %w", selector, err)
+	}
+
+	log.Printf("📜 已滚动到元素: %s", selector)
+	return nil
+}
+
+// Hover 鼠标悬停在元素上
+func (bm *BrowserManager) Hover(selector string) error {
+	if bm.Page == nil {
+		return fmt.Errorf("页面未初始化")
+	}
+
+	if err := bm.WaitForSelector(selector, 10*time.Second); err != nil {
+		return fmt.Errorf("等待悬停元素 %s 失败: %w", selector, err)
+	}
+
+	if err := bm.Page.Hover(selector); err != nil {
+		return fmt.Errorf("悬停元素 %s 失败: %w", selector, err)
+	}
+
+	log.Printf("🎯 已悬停在元素: %s", selector)
+	return nil
+}
+
+// SelectOption 从下拉菜单中选择选项
+func (bm *BrowserManager) SelectOption(selector, value string) error {
+	if bm.Page == nil {
+		return fmt.Errorf("页面未初始化")
+	}
+
+	if err := bm.WaitForSelector(selector, 10*time.Second); err != nil {
+		return fmt.Errorf("等待选择器元素 %s 失败: %w", selector, err)
+	}
+
+	// 使用SelectOptionValues类型
+	_, err := bm.Page.SelectOption(selector, playwright.SelectOptionValues{
+		Labels: playwright.StringSlice(value),
+	})
+	if err != nil {
+		return fmt.Errorf("选择选项 %s 失败: %w", value, err)
+	}
+
+	log.Printf("📋 已选择选项: %s = %s", selector, value)
+	return nil
+}
+
+// GetText 获取元素的文本内容
+func (bm *BrowserManager) GetText(selector string) (string, error) {
+	if bm.Page == nil {
+		return "", fmt.Errorf("页面未初始化")
+	}
+
+	if err := bm.WaitForSelector(selector, 10*time.Second); err != nil {
+		return "", fmt.Errorf("等待元素 %s 失败: %w", selector, err)
+	}
+
+	text, err := bm.Page.TextContent(selector)
+	if err != nil {
+		return "", fmt.Errorf("获取元素 %s 文本失败: %w", selector, err)
+	}
+
+	return text, nil
+}
+
+// GetAttribute 获取元素的属性值
+func (bm *BrowserManager) GetAttribute(selector, attribute string) (string, error) {
+	if bm.Page == nil {
+		return "", fmt.Errorf("页面未初始化")
+	}
+
+	if err := bm.WaitForSelector(selector, 10*time.Second); err != nil {
+		return "", fmt.Errorf("等待元素 %s 失败: %w", selector, err)
+	}
+
+	attr, err := bm.Page.GetAttribute(selector, attribute)
+	if err != nil {
+		return "", fmt.Errorf("获取元素 %s 属性 %s 失败: %w", selector, attribute, err)
+	}
+
+	return attr, nil
+}
+
+// IsVisible 检查元素是否可见
+func (bm *BrowserManager) IsVisible(selector string) (bool, error) {
+	if bm.Page == nil {
+		return false, fmt.Errorf("页面未初始化")
+	}
+
+	visible, err := bm.Page.IsVisible(selector)
+	if err != nil {
+		return false, fmt.Errorf("检查元素 %s 可见性失败: %w", selector, err)
+	}
+
+	return visible, nil
+}
+
+// WaitForElementDisappear 等待元素消失
+func (bm *BrowserManager) WaitForElementDisappear(selector string, timeout time.Duration) error {
+	if bm.Page == nil {
+		return fmt.Errorf("页面未初始化")
+	}
+
+	_, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	_, err := bm.Page.WaitForSelector(selector, playwright.PageWaitForSelectorOptions{
+		State:   playwright.WaitForSelectorStateHidden,
+		Timeout: playwright.Float(float64(timeout.Milliseconds())),
+	})
+	if err != nil {
+		return fmt.Errorf("等待元素 %s 消失超时: %w", selector, err)
+	}
+
+	log.Printf("⏱️ 元素已消失: %s", selector)
+	return nil
+}
+
+// DragAndDrop 拖拽元素到另一个位置
+func (bm *BrowserManager) DragAndDrop(sourceSelector, targetSelector string) error {
+	if bm.Page == nil {
+		return fmt.Errorf("页面未初始化")
+	}
+
+	// 等待源元素出现
+	if err := bm.WaitForSelector(sourceSelector, 10*time.Second); err != nil {
+		return fmt.Errorf("等待拖拽源元素 %s 失败: %w", sourceSelector, err)
+	}
+
+	// 等待目标元素出现
+	if err := bm.WaitForSelector(targetSelector, 10*time.Second); err != nil {
+		return fmt.Errorf("等待拖拽目标元素 %s 失败: %w", targetSelector, err)
+	}
+
+	// 执行拖拽
+	if err := bm.Page.DragAndDrop(sourceSelector, targetSelector); err != nil {
+		return fmt.Errorf("拖拽元素 %s 到 %s 失败: %w", sourceSelector, targetSelector, err)
+	}
+
+	log.Printf("🔄 已拖拽元素: %s -> %s", sourceSelector, targetSelector)
+	return nil
+}
+
+// RightClick 右键点击元素
+func (bm *BrowserManager) RightClick(selector string) error {
+	if bm.Page == nil {
+		return fmt.Errorf("页面未初始化")
+	}
+
+	if err := bm.WaitForSelector(selector, 10*time.Second); err != nil {
+		return fmt.Errorf("等待右键元素 %s 失败: %w", selector, err)
+	}
+
+	if err := bm.Page.Click(selector, playwright.PageClickOptions{
+		Button: playwright.MouseButtonRight,
+	}); err != nil {
+		return fmt.Errorf("右键点击元素 %s 失败: %w", selector, err)
+	}
+
+	log.Printf("🖱️ 已右键点击元素: %s", selector)
+	return nil
+}
+
 // Close 关闭浏览器
 func (bm *BrowserManager) Close() error {
 	if bm.Context != nil {

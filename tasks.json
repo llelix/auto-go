@@ -1,15 +1,76 @@
 [
   {
-    "name": "测试",
-    "url": "http://192.168.137.100:3000/manage/modeling-add?ds_id=ee488c4b1e514c90afa36139b25923f7&ds_name=company&model_type=table",
-    "form_fields": {
-      "#ant-input css-fob9pg ant-input-outlined": "自动化"
-    },
-    "click_after": [
-      "#su"
-    ],
+    "name": "示例任务 - 页面导航",
+    "url": "https://example.com",
     "wait_time": 3,
-    "screenshot": true
+    "screenshot": true,
+    "actions": [
+      {
+        "type": "wait_appear",
+        "selector": "h1",
+        "timeout": 5,
+        "error_message": "等待页面标题出现失败"
+      },
+      {
+        "type": "get_text",
+        "selector": "h1",
+        "output_key": "pageTitle",
+        "error_message": "获取页面标题失败"
+      }
+    ]
+  },
+  {
+    "name": "示例表单填写",
+    "url": "https://example.org/form",
+    "wait_time": 5,
+    "screenshot": true,
+    "actions": [
+      {
+        "type": "wait_appear",
+        "selector": "#agree-terms",
+        "timeout": 5,
+        "error_message": "等待同意条款复选框出现失败"
+      },
+      {
+        "type": "click",
+        "selector": "#agree-terms",
+        "error_message": "点击同意条款复选框失败"
+      },
+      {
+        "type": "fill",
+        "selector": "#name",
+        "value": "张三",
+        "error_message": "填写姓名失败"
+      },
+      {
+        "type": "fill",
+        "selector": "#email",
+        "value": "zhangsan@example.com",
+        "error_message": "填写邮箱失败"
+      },
+      {
+        "type": "fill",
+        "selector": "#phone",
+        "value": "13800138000",
+        "error_message": "填写电话失败"
+      },
+      {
+        "type": "fill",
+        "selector": "#message",
+        "value": "这是一个测试消息",
+        "error_message": "填写消息失败"
+      },
+      {
+        "type": "click",
+        "selector": "#submit-btn",
+        "error_message": "点击提交按钮失败"
+      },
+      {
+        "type": "wait_appear",
+        "selector": "#success-message",
+        "timeout": 10,
+        "error_message": "等待成功消息出现失败"
+      }
+    ]
   }
 ]
-

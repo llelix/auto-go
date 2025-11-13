@@ -3,7 +3,7 @@ package print
 import (
 	"fmt"
 
-	"github.com/mike/auto-go/operater"
+	"github.com/mike/auto-go/internal/logger"
 )
 
 // StartExecution 打印任务开始信息
@@ -26,7 +26,7 @@ func BrowserSuccess() {
 }
 
 // TaskStatistics 打印任务统计信息
-func TaskStatistics(results []operater.TaskResult, totalTasks int) {
+func TaskStatistics(results []logger.TaskResult, totalTasks int) {
 	var successCount, failureCount int
 
 	for _, result := range results {

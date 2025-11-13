@@ -131,28 +131,78 @@ func getChromePath(c *cli.Context, appConfig *config.Config) string {
 func createSampleTasksFile(tasksPath string) error {
 	sampleTasks := []operater.Task{
 		{
-			Name: "示例任务",
+			Name: "示例任务 - 页面导航",
 			URL:  "https://example.com",
 			WaitTime: 3,
 			Screenshot: true,
+			Actions: []operater.Action{
+				{
+					Type: operater.ActionWaitAppear,
+					Selector: "h1",
+					Timeout: 5,
+					ErrorMessage: "等待页面标题出现失败",
+				},
+				{
+					Type: operater.ActionGetText,
+					Selector: "h1",
+					OutputKey: "pageTitle",
+					ErrorMessage: "获取页面标题失败",
+				},
+			},
 		},
 		{
 			Name: "示例表单填写",
 			URL:  "https://example.org/form",
-			FormFields: map[string]string{
-				"#name":    "张三",
-				"#email":   "zhangsan@example.com",
-				"#phone":   "13800138000",
-				"#message": "这是一个测试消息",
-			},
-			ClickBefore: []string{
-				"#agree-terms",
-			},
-			ClickAfter: []string{
-				"#submit-btn",
-			},
-			WaitTime:   5,
+			WaitTime: 5,
 			Screenshot: true,
+			Actions: []operater.Action{
+				{
+					Type: operater.ActionWaitAppear,
+					Selector: "#agree-terms",
+					Timeout: 5,
+					ErrorMessage: "等待同意条款复选框出现失败",
+				},
+				{
+					Type: operater.ActionClick,
+					Selector: "#agree-terms",
+					ErrorMessage: "点击同意条款复选框失败",
+				},
+				{
+					Type: operater.ActionFill,
+					Selector: "#name",
+					Value: "张三",
+					ErrorMessage: "填写姓名失败",
+				},
+				{
+					Type: operater.ActionFill,
+					Selector: "#email",
+					Value: "zhangsan@example.com",
+					ErrorMessage: "填写邮箱失败",
+				},
+				{
+					Type: operater.ActionFill,
+					Selector: "#phone",
+					Value: "13800138000",
+					ErrorMessage: "填写电话失败",
+				},
+				{
+					Type: operater.ActionFill,
+					Selector: "#message",
+					Value: "这是一个测试消息",
+					ErrorMessage: "填写消息失败",
+				},
+				{
+					Type: operater.ActionClick,
+					Selector: "#submit-btn",
+					ErrorMessage: "点击提交按钮失败",
+				},
+				{
+					Type: operater.ActionWaitAppear,
+					Selector: "#success-message",
+					Timeout: 10,
+					ErrorMessage: "等待成功消息出现失败",
+				},
+			},
 		},
 	}
 	

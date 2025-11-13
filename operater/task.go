@@ -3,31 +3,49 @@ package operater
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
-	"path/filepath"
 	"time"
+
+	"github.com/mike/auto-go/internal/logger"
 )
+
+// ActionType 定义操作类型
+type ActionType string
+
+const (
+	ActionClick        ActionType = "click"
+	ActionFill         ActionType = "fill"
+	ActionHover        ActionType = "hover"
+	ActionSelect       ActionType = "select"
+	ActionScroll       ActionType = "scroll"
+	ActionRightClick   ActionType = "right_click"
+	ActionDragDrop     ActionType = "drag_drop"
+	ActionWaitAppear   ActionType = "wait_appear"
+	ActionWaitDisappear ActionType = "wait_disappear"
+	ActionGetText      ActionType = "get_text"
+	ActionGetAttribute ActionType = "get_attribute"
+)
+
+// Action 定义单个元素操作
+type Action struct {
+	Type         ActionType      `json:"type"`
+	Selector     string          `json:"selector"`
+	Value        string          `json:"value,omitempty"`
+	Target       string          `json:"target,omitempty"` // 用于拖拽目标或其他需要第二个元素的场景
+	Attribute    string          `json:"attribute,omitempty"` // 用于获取属性
+	Timeout      int             `json:"timeout,omitempty"` // 超时时间(秒)，默认10秒
+	OutputKey    string          `json:"output_key,omitempty"` // 用于存储操作结果的键名
+	ErrorMessage string          `json:"error_message,omitempty"` // 自定义错误信息
+}
 
 // Task 定义自动化任务
 type Task struct {
-	Name        string            `json:"name"`
-	URL         string            `json:"url"`
-	FormFields  map[string]string `json:"form_fields"`
-	ClickBefore []string          `json:"click_before,omitempty"`
-	ClickAfter  []string          `json:"click_after,omitempty"`
-	WaitTime    int               `json:"wait_time,omitempty"`
-	Screenshot  bool              `json:"screenshot,omitempty"`
-}
-
-// TaskResult 任务执行结果
-type TaskResult struct {
-	TaskName   string    `json:"task_name"`
-	Success    bool      `json:"success"`
-	Error      string    `json:"error,omitempty"`
-	StartTime  time.Time `json:"start_time"`
-	EndTime    time.Time `json:"end_time"`
-	Duration   float64   `json:"duration"`
-	Screenshot string    `json:"screenshot,omitempty"`
+	Name       string   `json:"name"`
+	URL        string   `json:"url"`
+	WaitTime   int      `json:"wait_time,omitempty"`
+	Screenshot bool     `json:"screenshot,omitempty"`
+	Actions    []Action `json:"actions"` // 灵活操作序列，必填
 }
 
 // TaskManager 管理自动化任务
@@ -43,16 +61,25 @@ func NewTaskManager(bm *BrowserManager) *TaskManager {
 }
 
 // ExecuteTask 执行单个任务
-func (tm *TaskManager) ExecuteTask(task Task) TaskResult {
-	result := TaskResult{
+func (tm *TaskManager) ExecuteTask(task Task) logger.TaskResult {
+	startTime := time.Now()
+	result := logger.TaskResult{
 		TaskName:  task.Name,
-		StartTime: time.Now(),
+		StartTime: startTime.Format("2006-01-02 15:04:05"),
 	}
 
 	defer func() {
-		result.EndTime = time.Now()
-		result.Duration = result.EndTime.Sub(result.StartTime).Seconds()
+		endTime := time.Now()
+		result.EndTime = endTime.Format("2006-01-02 15:04:05")
+		result.Duration = endTime.Sub(startTime).Seconds()
 	}()
+
+	// 检查任务是否包含操作序列
+	if len(task.Actions) == 0 {
+		result.Success = false
+		result.Error = "任务未定义操作序列(Actions)，请至少添加一个操作"
+		return result
+	}
 
 	// 导航到指定URL
 	if err := tm.BrowserManager.Navigate(task.URL); err != nil {
@@ -64,31 +91,11 @@ func (tm *TaskManager) ExecuteTask(task Task) TaskResult {
 	// 等待页面加载
 	time.Sleep(time.Duration(task.WaitTime) * time.Second)
 
-	// 执行前置点击操作
-	for i, selector := range task.ClickBefore {
-		if err := tm.BrowserManager.Click(selector); err != nil {
-			result.Success = false
-			result.Error = fmt.Sprintf("前置点击失败 [%d]: %s - %v", i+1, selector, err)
-			return result
-		}
-	}
-
-	// 填写表单
-	if len(task.FormFields) > 0 {
-		if err := tm.BrowserManager.FillForm(task.FormFields); err != nil {
-			result.Success = false
-			result.Error = fmt.Sprintf("表单填写失败: %v", err)
-			return result
-		}
-	}
-
-	// 执行后置点击操作
-	for i, selector := range task.ClickAfter {
-		if err := tm.BrowserManager.Click(selector); err != nil {
-			result.Success = false
-			result.Error = fmt.Sprintf("后置点击失败 [%d]: %s - %v", i+1, selector, err)
-			return result
-		}
+	// 执行操作序列
+	if err := tm.executeActions(task.Actions); err != nil {
+		result.Success = false
+		result.Error = fmt.Sprintf("执行操作序列失败: %v", err)
+		return result
 	}
 
 	// 截取屏幕截图
@@ -112,9 +119,110 @@ func (tm *TaskManager) ExecuteTask(task Task) TaskResult {
 	return result
 }
 
+// executeActions 执行操作序列
+func (tm *TaskManager) executeActions(actions []Action) error {
+	for i, action := range actions {
+		var err error
+		
+		switch action.Type {
+		case ActionClick:
+			err = tm.BrowserManager.Click(action.Selector)
+			
+		case ActionFill:
+			if action.Value == "" {
+				err = fmt.Errorf("fill操作需要提供value参数")
+			} else {
+				err = tm.BrowserManager.FillForm(map[string]string{action.Selector: action.Value})
+			}
+			
+		case ActionHover:
+			err = tm.BrowserManager.Hover(action.Selector)
+			
+		case ActionSelect:
+			if action.Value == "" {
+				err = fmt.Errorf("select操作需要提供value参数")
+			} else {
+				err = tm.BrowserManager.SelectOption(action.Selector, action.Value)
+			}
+			
+		case ActionScroll:
+			err = tm.BrowserManager.ScrollToElement(action.Selector)
+			
+		case ActionRightClick:
+			err = tm.BrowserManager.RightClick(action.Selector)
+			
+		case ActionDragDrop:
+			if action.Target == "" {
+				err = fmt.Errorf("drag_drop操作需要提供target参数")
+			} else {
+				err = tm.BrowserManager.DragAndDrop(action.Selector, action.Target)
+			}
+			
+		case ActionWaitAppear:
+			timeout := time.Duration(10) * time.Second
+			if action.Timeout > 0 {
+				timeout = time.Duration(action.Timeout) * time.Second
+			}
+			err = tm.BrowserManager.WaitForSelector(action.Selector, timeout)
+			
+		case ActionWaitDisappear:
+			timeout := time.Duration(10) * time.Second
+			if action.Timeout > 0 {
+				timeout = time.Duration(action.Timeout) * time.Second
+			}
+			err = tm.BrowserManager.WaitForElementDisappear(action.Selector, timeout)
+			
+		case ActionGetText:
+			text, getTextErr := tm.BrowserManager.GetText(action.Selector)
+			if getTextErr != nil {
+				err = getTextErr
+			} else {
+				log.Printf("📝 获取元素文本: %s = '%s'", action.Selector, text)
+				// 如果提供了输出键名，可以在这里存储结果
+				if action.OutputKey != "" {
+					// 这里可以扩展为将结果存储到某个上下文中
+					log.Printf("📋 文本已存储到键: %s", action.OutputKey)
+				}
+			}
+			
+		case ActionGetAttribute:
+			if action.Attribute == "" {
+				err = fmt.Errorf("get_attribute操作需要提供attribute参数")
+			} else {
+				attr, getAttrErr := tm.BrowserManager.GetAttribute(action.Selector, action.Attribute)
+				if getAttrErr != nil {
+					err = getAttrErr
+				} else {
+					log.Printf("🏷️ 获取元素属性: %s.%s = '%s'", action.Selector, action.Attribute, attr)
+					// 如果提供了输出键名，可以在这里存储结果
+					if action.OutputKey != "" {
+						// 这里可以扩展为将结果存储到某个上下文中
+						log.Printf("📋 属性值已存储到键: %s", action.OutputKey)
+					}
+				}
+			}
+			
+		default:
+			err = fmt.Errorf("不支持的操作类型: %s", action.Type)
+		}
+		
+		if err != nil {
+			if action.ErrorMessage != "" {
+				return fmt.Errorf("操作失败 [%d]: %s", i+1, action.ErrorMessage)
+			}
+			return fmt.Errorf("操作失败 [%d]: %s - %v", i+1, action.Type, err)
+		}
+		
+		// 操作间添加短暂延迟，提高执行稳定性
+		time.Sleep(500 * time.Millisecond)
+	}
+	
+	return nil
+}
+
 // ExecuteTasks 批量执行任务
-func (tm *TaskManager) ExecuteTasks(tasks []Task) []TaskResult {
-	var results []TaskResult
+func (tm *TaskManager) ExecuteTasks(tasks []Task) []logger.TaskResult {
+	var results []logger.TaskResult
 
 	for _, task := range tasks {
 		fmt.Printf("🚀 开始执行任务: %s\n", task.Name)
@@ -135,26 +243,8 @@ func (tm *TaskManager) ExecuteTasks(tasks []Task) []TaskResult {
 }
 
 // SaveTaskResults 保存任务结果到JSON文件
-func (tm *TaskManager) SaveTaskResults(results []TaskResult, filename string) error {
-	//保存到logs目录下没有就创建
-	if err := os.MkdirAll("logs", os.ModePerm); err != nil {
-		return fmt.Errorf("创建logs目录失败: %w", err)
-	}
-
-	file, err := os.Create(filepath.Join("logs", filename))
-	if err != nil {
-		return fmt.Errorf("创建结果文件失败: %w", err)
-	}
-	defer file.Close()
-
-	encoder := json.NewEncoder(file)
-	encoder.SetIndent("", "  ")
-
-	if err := encoder.Encode(results); err != nil {
-		return fmt.Errorf("编码结果失败: %w", err)
-	}
-
-	return nil
+func (tm *TaskManager) SaveTaskResults(results []logger.TaskResult, filename string) error {
+	return logger.SaveTaskResults(results, filename)
 }
 
 // LoadTasksFromFile 从JSON文件加载任务配置

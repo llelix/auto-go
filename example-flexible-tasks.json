@@ -1,0 +1,193 @@
+[
+  {
+    "name": "灵活操作示例 - 填写复杂表单",
+    "url": "https://example.com/form",
+    "wait_time": 3,
+    "screenshot": true,
+    "actions": [
+      {
+        "type": "click",
+        "selector": "#accept-cookies",
+        "error_message": "接受cookies失败"
+      },
+      {
+        "type": "scroll",
+        "selector": "#user-form",
+        "error_message": "滚动到表单区域失败"
+      },
+      {
+        "type": "fill",
+        "selector": "#username",
+        "value": "testuser123",
+        "error_message": "用户名填写失败"
+      },
+      {
+        "type": "fill",
+        "selector": "#email",
+        "value": "test@example.com",
+        "error_message": "邮箱填写失败"
+      },
+      {
+        "type": "select",
+        "selector": "#country",
+        "value": "China",
+        "error_message": "国家选择失败"
+      },
+      {
+        "type": "wait_appear",
+        "selector": "#state-dropdown",
+        "timeout": 5,
+        "error_message": "等待省份下拉菜单出现失败"
+      },
+      {
+        "type": "select",
+        "selector": "#state",
+        "value": "Beijing",
+        "error_message": "省份选择失败"
+      },
+      {
+        "type": "hover",
+        "selector": "#terms-link",
+        "error_message": "悬停条款链接失败"
+      },
+      {
+        "type": "click",
+        "selector": "#agree-terms",
+        "error_message": "同意条款勾选失败"
+      },
+      {
+        "type": "right_click",
+        "selector": "#advanced-options",
+        "error_message": "右键点击高级选项失败"
+      },
+      {
+        "type": "click",
+        "selector": "#submit-btn",
+        "error_message": "提交表单失败"
+      },
+      {
+        "type": "wait_disappear",
+        "selector": "#loading-indicator",
+        "timeout": 15,
+        "error_message": "等待加载完成失败"
+      }
+    ]
+  },
+  {
+    "name": "拖拽操作示例",
+    "url": "https://example.com/drag-and-drop",
+    "wait_time": 2,
+    "screenshot": true,
+    "actions": [
+      {
+        "type": "wait_appear",
+        "selector": "#draggable-element",
+        "error_message": "等待可拖拽元素出现失败"
+      },
+      {
+        "type": "wait_appear",
+        "selector": "#drop-zone",
+        "error_message": "等待放置区域出现失败"
+      },
+      {
+        "type": "drag_drop",
+        "selector": "#draggable-element",
+        "target": "#drop-zone",
+        "error_message": "拖拽操作失败"
+      },
+      {
+        "type": "wait_appear",
+        "selector": "#success-message",
+        "timeout": 5,
+        "error_message": "等待成功消息出现失败"
+      }
+    ]
+  },
+  {
+    "name": "信息获取示例",
+    "url": "https://example.com/product-page",
+    "wait_time": 3,
+    "screenshot": true,
+    "actions": [
+      {
+        "type": "click",
+        "selector": "#product-details-tab",
+        "error_message": "点击产品详情标签失败"
+      },
+      {
+        "type": "wait_appear",
+        "selector": "#product-info",
+        "timeout": 5,
+        "error_message": "等待产品信息区域出现失败"
+      },
+      {
+        "type": "get_text",
+        "selector": "#product-name",
+        "output_key": "productName",
+        "error_message": "获取产品名称失败"
+      },
+      {
+        "type": "get_text",
+        "selector": "#product-price",
+        "output_key": "productPrice",
+        "error_message": "获取产品价格失败"
+      },
+      {
+        "type": "get_attribute",
+        "selector": "#product-image",
+        "attribute": "src",
+        "output_key": "productImageSrc",
+        "error_message": "获取产品图片链接失败"
+      },
+      {
+        "type": "scroll",
+        "selector": "#reviews-section",
+        "error_message": "滚动到评价区域失败"
+      },
+      {
+        "type": "get_text",
+        "selector": "#rating-value",
+        "output_key": "ratingValue",
+        "error_message": "获取评分失败"
+      }
+    ]
+  },
+  {
+    "name": "多步骤交互示例",
+    "url": "https://example.com/interactive",
+    "wait_time": 2,
+    "screenshot": true,
+    "actions": [
+      {
+        "type": "wait_appear",
+        "selector": "#start-button",
+        "timeout": 5,
+        "error_message": "等待开始按钮出现失败"
+      },
+      {
+        "type": "click",
+        "selector": "#start-button",
+        "error_message": "点击开始按钮失败"
+      },
+      {
+        "type": "wait_appear",
+        "selector": "#progress-bar",
+        "timeout": 10,
+        "error_message": "等待进度条出现失败"
+      },
+      {
+        "type": "wait_disappear",
+        "selector": "#loading-spinner",
+        "timeout": 15,
+        "error_message": "等待加载完成失败"
+      },
+      {
+        "type": "get_attribute",
+        "selector": "#progress-bar",
+        "attribute": "value",
+        "output_key": "progressValue",
+        "error_message": "获取进度值失败"
+      }
+    ]
+  }
+]
