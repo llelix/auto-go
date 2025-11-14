@@ -3,7 +3,6 @@ package cmd
 import (
 	_ "embed"
 	"fmt"
-	"os"
 
 	"github.com/mike/auto-go/config"
 	"github.com/mike/auto-go/internal/automation"
@@ -115,15 +114,10 @@ func getChromePath(c *cli.Context, appConfig *config.Config) string {
 	return appConfig.Browser.ExecutablePath
 }
 
-//go:embed tasks_template.json
 var tasksTemplate string
 
 // createSampleTasksFile 创建示例任务文件
 func createSampleTasksFile(tasksPath string) error {
-	// 将嵌入的模板内容写入文件
-	if err := os.WriteFile(tasksPath, []byte(tasksTemplate), 0644); err != nil {
-		return fmt.Errorf("写入示例任务文件失败: %w", err)
-	}
 
 	return nil
 }

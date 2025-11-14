@@ -35,13 +35,8 @@ go run main.go init
 
 ```bash
 # 使用默认设置启动Mock服务器（端口8080）
-go run main.go mock
+cd mockserver && go run main.go 
 
-# 自定义端口
-go run main.go mock --port 3000
-
-# 指定模板目录
-go run main.go mock --templates custom/templates
 ```
 
 Mock服务器提供了各种测试场景，包括表单填写、拖拽操作、信息获取等。详细说明请参考 [Mock服务器文档](mock_server/README.md)。
