@@ -227,7 +227,7 @@ func (bm *BrowserManager) SelectOption(selector, value string) error {
 	}
 
 	// 使用SelectOptionValues类型
-	_, err := bm.Page.SelectOption(selector, playwright.SelectOptionValues{
+	_, err := bm.Page.Locator(selector).SelectOption(playwright.SelectOptionValues{
 		Labels: playwright.StringSlice(value),
 	})
 	if err != nil {

@@ -91,7 +91,7 @@
       {
         "type": "select",
         "selector": "#country",
-        "value": "china",
+        "value": "中国",
         "error_message": "选择国家失败"
       },
       {
@@ -103,7 +103,7 @@
       {
         "type": "select",
         "selector": "#state",
-        "value": "Beijing",
+        "value": "北京",
         "error_message": "选择省份失败"
       },
       {
@@ -130,7 +130,7 @@
       {
         "type": "select",
         "selector": "#theme",
-        "value": "dark",
+        "value": "深色",
         "error_message": "选择主题失败"
       },
       {
