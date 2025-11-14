@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品目录 - Auto-Go Mock Server</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+        .category {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .category h2 {
+            color: #007bff;
+            margin-top: 0;
+        }
+        .products {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .product {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #eee;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .product:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .product h3 {
+            margin: 10px 0;
+            color: #333;
+            font-size: 16px;
+        }
+        .product .price {
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .product-detail {
+            margin-top: 20px;
+            padding: 20px;
+            background: #e8f4fd;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+            display: none;
+        }
+        .product-detail h3 {
+            color: #007bff;
+            margin-top: 0;
+        }
+        .search-box {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .search-box input {
+            padding: 10px;
+            width: 300px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .status-message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            display: none;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>商品目录</h1>
+        
+        <div class="search-box">
+            <input type="text" id="search-input" placeholder="搜索商品...">
+        </div>
+        
+        <div id="status-message" class="status-message"></div>
+
+        <!-- 电子产品分类 -->
+        <div class="category">
+            <h2 class="category-1">电子产品</h2>
+            <div class="products">
+                <div class="product" data-product="1">
+                    <h3>iPhone 14</h3>
+                    <div class="price">¥5999</div>
+                </div>
+                <div class="product" data-product="2">
+                    <h3>MacBook Pro</h3>
+                    <div class="price">¥12999</div>
+                </div>
+                <div class="product" data-product="3">
+                    <h3>iPad Air</h3>
+                    <div class="price">¥4799</div>
+                </div>
+                <div class="product" data-product="4">
+                    <h3>AirPods Pro</h3>
+                    <div class="price">¥1999</div>
+                </div>
+                <div class="product" data-product="5">
+                    <h3>Apple Watch</h3>
+                    <div class="price">¥3199</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 家居用品分类 -->
+        <div class="category">
+            <h2 class="category-2">家居用品</h2>
+            <div class="products">
+                <div class="product" data-product="6">
+                    <h3>智能灯具</h3>
+                    <div class="price">¥299</div>
+                </div>
+                <div class="product" data-product="7">
+                    <h3>电动牙刷</h3>
+                    <div class="price">¥399</div>
+                </div>
+                <div class="product" data-product="8">
+                    <h3>空气净化器</h3>
+                    <div class="price">¥899</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 服装分类 -->
+        <div class="category">
+            <h2 class="category-3">服装</h2>
+            <div class="products">
+                <div class="product" data-product="9">
+                    <h3>T恤</h3>
+                    <div class="price">¥99</div>
+                </div>
+                <div class="product" data-product="10">
+                    <h3>牛仔裤</h3>
+                    <div class="price">¥199</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 产品详情区域 -->
+        <div id="product-detail" class="product-detail">
+            <h3 id="product-name">产品名称</h3>
+            <p id="product-description">产品描述将在这里显示</p>
+            <div id="product-specs">
+                <!-- 产品规格将动态显示 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 产品数据
+        const products = {
+            1: { name: 'iPhone 14', description: '最新款iPhone，强大的A16芯片', specs: '6.1英寸, 128GB, 5G' },
+            2: { name: 'MacBook Pro', description: '专业级笔记本电脑', specs: '14英寸, M2芯片, 16GB RAM' },
+            3: { name: 'iPad Air', description: '轻薄便携的平板电脑', specs: '10.9英寸, M1芯片, 64GB' },
+            4: { name: 'AirPods Pro', description: '主动降噪无线耳机', specs: 'H2芯片, 空间音频, 6小时续航' },
+            5: { name: 'Apple Watch', description: '智能手表，健康监测', specs: '45mm, GPS+蜂窝, 全天续航' },
+            6: { name: '智能灯具', description: '可调光色温的智能灯具', specs: 'RGB调色, 语音控制, 定时开关' },
+            7: { name: '电动牙刷', description: '超声波清洁牙齿', specs: '5种模式, 无线充电, 30天续航' },
+            8: { name: '空气净化器', description: '高效空气净化设备', specs: 'HEPA过滤, 智能检测, 静音模式' },
+            9: { name: 'T恤', description: '纯棉舒适T恤', specs: '100%棉, 多色可选, 多种尺码' },
+            10: { name: '牛仔裤', description: '经典款牛仔裤', specs: '丹宁面料, 修身版型, 多尺码' }
+        };
+
+        // 页面加载后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 为所有产品添加点击事件
+            const productElements = document.querySelectorAll('.product');
+            productElements.forEach(product => {
+                product.addEventListener('click', function() {
+                    const productId = this.getAttribute('data-product');
+                    showProductDetail(productId);
+                });
+            });
+            
+            // 搜索功能
+            const searchInput = document.getElementById('search-input');
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                filterProducts(searchTerm);
+            });
+            
+            // 显示欢迎消息
+            showStatus('欢迎浏览商品目录！', 'info');
+        });
+        
+        function showProductDetail(productId) {
+            const product = products[productId];
+            if (!product) return;
+            
+            const detailDiv = document.getElementById('product-detail');
+            document.getElementById('product-name').textContent = product.name;
+            document.getElementById('product-description').textContent = product.description;
+            document.getElementById('product-specs').innerHTML = `<strong>规格：</strong>${product.specs}`;
+            
+            detailDiv.style.display = 'block';
+            
+            showStatus(`已选择产品: ${product.name}`, 'success');
+        }
+        
+        function filterProducts(searchTerm) {
+            const productElements = document.querySelectorAll('.product');
+            
+            productElements.forEach(product => {
+                const productId = product.getAttribute('data-product');
+                const productData = products[productId];
+                
+                if (productData && 
+                    (productData.name.toLowerCase().includes(searchTerm) ||
+                     productData.description.toLowerCase().includes(searchTerm))) {
+                    product.style.display = 'block';
+                } else {
+                    product.style.display = 'none';
+                }
+            });
+            
+            if (searchTerm) {
+                showStatus(`搜索: "${searchTerm}"`, 'info');
+            }
+        }
+        
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status-message');
+            statusDiv.textContent = message;
+            statusDiv.className = 'status-message ' + type;
+            statusDiv.style.display = 'block';
+            
+            // 3秒后自动隐藏
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 3000);
+        }
+        
+        // 提供API供自动化测试使用
+        window.getProductName = function(productId) {
+            const product = products[productId];
+            return product ? product.name : null;
+        };
+        
+        window.selectProduct = function(productId) {
+            showProductDetail(productId);
+            return true;
+        };
+        
+        window.searchProducts = function(searchTerm) {
+            filterProducts(searchTerm.toLowerCase());
+            return true;
+        };
+        
+        window.getCategoryName = function(categoryId) {
+            const categoryElement = document.querySelector(`.category-${categoryId}`);
+            return categoryElement ? categoryElement.textContent : null;
+        };
+    </script>
+</body>
+</html>

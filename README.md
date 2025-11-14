@@ -12,6 +12,10 @@
 - ✅ **批量任务执行** - 支持批量执行多个自动化任务
 - ✅ **命令行界面** - 友好的命令行操作界面
 - ✅ **跨平台支持** - Windows/Linux/macOS全平台支持
+- ✅ **新增：流程控制结构** - 支持for循环、if条件分支控制
+- ✅ **新增：变量管理** - 支持变量存储和引用
+- ✅ **新增：表达式求值** - 支持布尔表达式和算术运算
+- ✅ **新增：控制流管理** - 支持break、continue控制流
 
 ## 快速开始
 
@@ -77,7 +81,7 @@ go run main.go run --config custom-config.json --tasks my-tasks.json
 }
 ```
 
-### 任务配置 (tasks.json)
+### 基础任务配置 (tasks.json)
 
 ```json
 [
@@ -122,6 +126,45 @@ go run main.go run --config custom-config.json --tasks my-tasks.json
 ]
 ```
 
+### 流程控制任务配置 (tasks_with_control.json)
+
+```json
+[
+  {
+    "name": "带流程控制的任务",
+    "url": "http://localhost:8080/test-page",
+    "actions": [
+      {
+        "type": "for",
+        "children": [
+          {
+            "type": "click",
+            "selector": ".button-{{i}}",
+            "error_message": "点击按钮 {{i}} 失败"
+          }
+        ],
+        "variable": "i",
+        "from": 1,
+        "to": 5,
+        "step": 1
+      },
+      {
+        "type": "if",
+        "condition": "pageTitle == '登录页面'",
+        "children": [
+          {
+            "type": "fill",
+            "selector": "#username",
+            "value": "testuser",
+            "error_message": "填写用户名失败"
+          }
+        ]
+      }
+    ]
+  }
+]
+```
+
 ## 任务配置字段说明
 
 - **name**: 任务名称（用于标识和日志输出）
@@ -140,6 +183,7 @@ go run main.go run --config custom-config.json --tasks my-tasks.json
 
 ## 支持的操作类型
 
+### 基础操作类型
 - **click**: 点击元素
 - **fill**: 填写表单字段
 - **hover**: 鼠标悬停在元素上
@@ -151,6 +195,31 @@ go run main.go run --config custom-config.json --tasks my-tasks.json
 - **wait_disappear**: 等待元素消失
 - **get_text**: 获取元素的文本内容
 - **get_attribute**: 获取元素的属性值
+
+### 流程控制操作类型
+- **for**: for循环控制结构
+  - `variable`: 循环变量名
+  - `from`: 起始值
+  - `to`: 结束值  
+  - `step`: 步长（默认为1）
+  - `children`: 循环体内的操作序列
+- **if**: 条件分支控制结构
+  - `condition`: 布尔表达式条件
+  - `children`: 条件为真时执行的操作序列
+- **break**: 跳出当前循环
+- **continue**: 跳过当前循环迭代
+
+### 表达式语法
+支持变量引用和布尔表达式：
+- **变量引用**: `{{变量名}}`（在selector、value中引用）
+- **比较操作**: `==`, `!=`, `>`, `<`, `>=`, `<=`
+- **逻辑操作**: `&&`, `||`, `!`
+- **算术操作**: 支持基本的数值运算
+
+示例表达式：
+- `pageTitle == '登录页面'`
+- `notificationCount > 0 && userRole == 'admin'`
+- `index >= 1 && index <= 5`
 
 ## 支持的CSS选择器示例
 
@@ -196,6 +265,16 @@ func (bm *BrowserManager) SelectOption(selector, value string) error {
 }
 ```
 
+### 流程控制示例
+
+```go
+// 使用ControlExecutor执行带流程控制的任务
+func (tm *TaskManager) ExecuteTask(task Task) error {
+    executor := NewControlExecutor(tm)
+    return executor.ExecuteNodeItems(task.Actions)
+}
+```
+
 ## 常见问题
 
 ### Q: 浏览器启动失败怎么办？
@@ -206,6 +285,12 @@ A: 使用交互模式运行，观察浏览器实际页面元素结构。
 
 ### Q: 任务执行速度太慢？
 A: 调整 `wait_time` 参数，或在配置中减少截图等非必要操作。
+
+### Q: 如何使用流程控制功能？
+A: 参考 `tasks_with_control.json` 示例文件，使用for循环和if条件分支构建复杂自动化流程。
+
+### Q: 如何调试表达式求值？
+A: 在控制执行器中启用详细日志，查看变量赋值和表达式求值结果。
 
 ## 许可证
 

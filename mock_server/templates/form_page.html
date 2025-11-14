@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>表单页面 - Auto-Go Mock Server</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"], input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0,123,255,0.3);
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+        }
+        .checkbox-group input {
+            margin-right: 10px;
+        }
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none;
+        }
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none;
+        }
+        .page-type {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #666;
+        }
+        .switch-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .switch-link a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .switch-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="page-title">表单页面</h1>
+        
+        <div class="page-type" id="page-type">请选择页面类型</div>
+        
+        <div class="switch-link">
+            <a href="#" onclick="switchPageType('login')">切换到登录页面</a> | 
+            <a href="#" onclick="switchPageType('register')">切换到注册页面</a>
+        </div>
+
+        <!-- 登录表单 -->
+        <div id="login-form" style="display: none;">
+            <h2>用户登录</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">用户名:</label>
+                    <input type="text" id="username" name="username" placeholder="请输入用户名">
+                </div>
+                <div class="form-group">
+                    <label for="password">密码:</label>
+                    <input type="password" id="password" name="password" placeholder="请输入密码">
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="remember-me" name="remember-me">
+                    <label for="remember-me">记住我</label>
+                </div>
+                <button type="submit" id="login-btn">登录</button>
+            </form>
+        </div>
+
+        <!-- 注册表单 -->
+        <div id="register-form" style="display: none;">
+            <h2>用户注册</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="email">邮箱地址:</label>
+                    <input type="email" id="reg-email" name="email" placeholder="请输入邮箱地址">
+                </div>
+                <div class="form-group">
+                    <label for="reg-username">用户名:</label>
+                    <input type="text" id="reg-username" name="username" placeholder="请输入用户名">
+                </div>
+                <div class="form-group">
+                    <label for="reg-password">密码:</label>
+                    <input type="password" id="reg-password" name="password" placeholder="请输入密码">
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="agree-terms" name="agree-terms">
+                    <label for="agree-terms">我同意服务条款</label>
+                </div>
+                <button type="submit" id="register-btn">注册</button>
+            </form>
+        </div>
+
+        <!-- 消息区域 -->
+        <div id="success-message" class="success-message"></div>
+        <div id="error-message" class="error-message"></div>
+    </div>
+
+    <script>
+        // 页面加载后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 默认显示登录页面
+            switchPageType('login');
+            
+            // 为表单添加提交事件
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                handleLogin();
+            });
+            
+            document.getElementById('registerForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                handleRegister();
+            });
+        });
+        
+        function switchPageType(type) {
+            // 隐藏所有表单
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('register-form').style.display = 'none';
+            
+            // 清除消息
+            hideMessages();
+            
+            // 显示对应的表单
+            if (type === 'login') {
+                document.getElementById('login-form').style.display = 'block';
+                document.getElementById('page-title').textContent = '登录页面';
+                document.getElementById('page-type').textContent = '登录页面';
+            } else if (type === 'register') {
+                document.getElementById('register-form').style.display = 'block';
+                document.getElementById('page-title').textContent = '注册页面';
+                document.getElementById('page-type').textContent = '注册页面';
+            }
+        }
+        
+        function handleLogin() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                showError('请输入用户名和密码');
+                return;
+            }
+            
+            // 模拟登录成功
+            showSuccess('登录成功！欢迎回来，' + username);
+            
+            // 清空表单
+            document.getElementById('loginForm').reset();
+        }
+        
+        function handleRegister() {
+            const email = document.getElementById('email').value;
+            const username = document.getElementById('reg-username').value;
+            const password = document.getElementById('reg-password').value;
+            const agreeTerms = document.getElementById('agree-terms').checked;
+            
+            if (!email || !username || !password) {
+                showError('请填写所有必填字段');
+                return;
+            }
+            
+            if (!agreeTerms) {
+                showError('请同意服务条款');
+                return;
+            }
+            
+            // 模拟注册成功
+            showSuccess('注册成功！欢迎加入，' + username);
+            
+            // 清空表单
+            document.getElementById('registerForm').reset();
+        }
+        
+        function showSuccess(message) {
+            const successDiv = document.getElementById('success-message');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            
+            // 3秒后自动隐藏
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 3000);
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            // 3秒后自动隐藏
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 3000);
+        }
+        
+        function hideMessages() {
+            document.getElementById('success-message').style.display = 'none';
+            document.getElementById('error-message').style.display = 'none';
+        }
+        
+        // 提供API供自动化测试使用
+        window.setPageTitle = function(title) {
+            document.getElementById('page-title').textContent = title;
+            document.getElementById('page-type').textContent = title;
+            return true;
+        };
+        
+        window.getPageTitle = function() {
+            return document.getElementById('page-title').textContent;
+        };
+        
+        window.switchToLogin = function() {
+            switchPageType('login');
+            return true;
+        };
+        
+        window.switchToRegister = function() {
+            switchPageType('register');
+            return true;
+        };
+    </script>
+</body>
+</html>

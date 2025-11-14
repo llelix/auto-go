@@ -3,7 +3,6 @@ package operator
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"time"
 
@@ -41,11 +40,11 @@ type Action struct {
 
 // Task 定义自动化任务
 type Task struct {
-	Name       string   `json:"name"`
-	URL        string   `json:"url"`
-	WaitTime   int      `json:"wait_time,omitempty"`
-	Screenshot bool     `json:"screenshot,omitempty"`
-	Actions    []Action `json:"actions"` // 灵活操作序列，必填
+	Name       string      `json:"name"`
+	URL        string      `json:"url"`
+	WaitTime   int         `json:"wait_time,omitempty"`
+	Screenshot bool        `json:"screenshot,omitempty"`
+	Actions    []NodeItem  `json:"actions"` // 灵活操作序列，支持流程控制
 }
 
 // TaskManager 管理自动化任务
@@ -119,104 +118,16 @@ func (tm *TaskManager) ExecuteTask(task Task) logger.TaskResult {
 	return result
 }
 
-// executeActions 执行操作序列
-func (tm *TaskManager) executeActions(actions []Action) error {
-	for i, action := range actions {
-		var err error
-
-		switch action.Type {
-		case ActionClick:
-			err = tm.BrowserManager.Click(action.Selector)
-
-		case ActionFill:
-			if action.Value == "" {
-				err = fmt.Errorf("fill操作需要提供value参数")
-			} else {
-				err = tm.BrowserManager.FillForm(map[string]string{action.Selector: action.Value})
-			}
-
-		case ActionHover:
-			err = tm.BrowserManager.Hover(action.Selector)
-
-		case ActionSelect:
-			if action.Value == "" {
-				err = fmt.Errorf("select操作需要提供value参数")
-			} else {
-				err = tm.BrowserManager.SelectOption(action.Selector, action.Value)
-			}
-
-		case ActionScroll:
-			err = tm.BrowserManager.ScrollToElement(action.Selector)
-
-		case ActionRightClick:
-			err = tm.BrowserManager.RightClick(action.Selector)
-
-		case ActionDragDrop:
-			if action.Target == "" {
-				err = fmt.Errorf("drag_drop操作需要提供target参数")
-			} else {
-				err = tm.BrowserManager.DragAndDrop(action.Selector, action.Target)
-			}
-
-		case ActionWaitAppear:
-			timeout := time.Duration(10) * time.Second
-			if action.Timeout > 0 {
-				timeout = time.Duration(action.Timeout) * time.Second
-			}
-			err = tm.BrowserManager.WaitForSelector(action.Selector, timeout)
-
-		case ActionWaitDisappear:
-			timeout := time.Duration(10) * time.Second
-			if action.Timeout > 0 {
-				timeout = time.Duration(action.Timeout) * time.Second
-			}
-			err = tm.BrowserManager.WaitForElementDisappear(action.Selector, timeout)
-
-		case ActionGetText:
-			text, getTextErr := tm.BrowserManager.GetText(action.Selector)
-			if getTextErr != nil {
-				err = getTextErr
-			} else {
-				log.Printf("📝 获取元素文本: %s = '%s'", action.Selector, text)
-				// 如果提供了输出键名，可以在这里存储结果
-				if action.OutputKey != "" {
-					// 这里可以扩展为将结果存储到某个上下文中
-					log.Printf("📋 文本已存储到键: %s", action.OutputKey)
-				}
-			}
-
-		case ActionGetAttribute:
-			if action.Attribute == "" {
-				err = fmt.Errorf("get_attribute操作需要提供attribute参数")
-			} else {
-				attr, getAttrErr := tm.BrowserManager.GetAttribute(action.Selector, action.Attribute)
-				if getAttrErr != nil {
-					err = getAttrErr
-				} else {
-					log.Printf("🏷️ 获取元素属性: %s.%s = '%s'", action.Selector, action.Attribute, attr)
-					// 如果提供了输出键名，可以在这里存储结果
-					if action.OutputKey != "" {
-						// 这里可以扩展为将结果存储到某个上下文中
-						log.Printf("📋 属性值已存储到键: %s", action.OutputKey)
-					}
-				}
-			}
-
-		default:
-			err = fmt.Errorf("不支持的操作类型: %s", action.Type)
-		}
-
-		if err != nil {
-			if action.ErrorMessage != "" {
-				return fmt.Errorf("操作失败 [%d]: %s", i+1, action.ErrorMessage)
-			}
-			return fmt.Errorf("操作失败 [%d]: %s - %v", i+1, action.Type, err)
-		}
-
-		// 操作间添加短暂延迟，提高执行稳定性
-		time.Sleep(500 * time.Millisecond)
+// executeActions 执行操作序列（支持流程控制）
+func (tm *TaskManager) executeActions(items []NodeItem) error {
+	// 创建控制执行器
+	executor := NewControlExecutor(tm)
+	
+	// 执行节点项序列
+	if err := executor.ExecuteNodeItems(items); err != nil {
+		return err
 	}
-
+	
 	return nil
 }
 

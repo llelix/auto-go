@@ -1,0 +1,398 @@
+[
+  {
+    "name": "简单表单测试",
+    "url": "http://localhost:8080/simple-form",
+    "wait_time": 3,
+    "screenshot": true,
+    "actions": [
+      {
+        "type": "wait_appear",
+        "selector": "#name",
+        "timeout": 5,
+        "error_message": "等待姓名输入框出现失败"
+      },
+      {
+        "type": "fill",
+        "selector": "#name",
+        "value": "测试用户",
+        "error_message": "填写姓名失败"
+      },
+      {
+        "type": "fill",
+        "selector": "#email",
+        "value": "test@example.com",
+        "error_message": "填写邮箱失败"
+      },
+      {
+        "type": "fill",
+        "selector": "#phone",
+        "value": "13800138000",
+        "error_message": "填写电话失败"
+      },
+      {
+        "type": "fill",
+        "selector": "#message",
+        "value": "这是一个测试消息，用于验证auto-go的表单填写功能。",
+        "error_message": "填写消息失败"
+      },
+      {
+        "type": "click",
+        "selector": "#agree-terms",
+        "error_message": "点击同意条款复选框失败"
+      },
+      {
+        "type": "click",
+        "selector": "button[type='submit']",
+        "error_message": "点击提交按钮失败"
+      },
+      {
+        "type": "wait_appear",
+        "selector": "h1",
+        "timeout": 10,
+        "error_message": "等待提交成功页面出现失败"
+      }
+    ]
+  },
+  {
+    "name": "复杂表单测试",
+    "url": "http://localhost:8080/complex-form",
+    "wait_time": 3,
+    "screenshot": true,
+    "actions": [
+      {
+        "type": "wait_appear",
+        "selector": "#cookieBanner",
+        "timeout": 5,
+        "error_message": "等待Cookie横幅出现失败"
+      },
+      {
+        "type": "click",
+        "selector": "#acceptCookies",
+        "error_message": "点击接受Cookie按钮失败"
+      },
+      {
+        "type": "wait_disappear",
+        "selector": "#cookieBanner",
+        "timeout": 5,
+        "error_message": "等待Cookie横幅消失失败"
+      },
+      {
+        "type": "fill",
+        "selector": "#username",
+        "value": "testuser123",
+        "error_message": "填写用户名失败"
+      },
+      {
+        "type": "fill",
+        "selector": "#email",
+        "value": "test@example.com",
+        "error_message": "填写邮箱失败"
+      },
+      {
+        "type": "select",
+        "selector": "#country",
+        "value": "中国",
+        "error_message": "选择国家失败"
+      },
+      {
+        "type": "wait_appear",
+        "selector": "#stateGroup",
+        "timeout": 5,
+        "error_message": "等待省份下拉菜单出现失败"
+      },
+      {
+        "type": "select",
+        "selector": "#state",
+        "value": "北京",
+        "error_message": "选择省份失败"
+      },
+      {
+        "type": "hover",
+        "selector": ".tooltip",
+        "error_message": "悬停在帮助图标上失败"
+      },
+      {
+        "type": "click",
+        "selector": "#agree-terms",
+        "error_message": "点击同意条款复选框失败"
+      },
+      {
+        "type": "click",
+        "selector": "#show-advanced",
+        "error_message": "点击显示高级选项复选框失败"
+      },
+      {
+        "type": "wait_appear",
+        "selector": "#advancedOptions",
+        "timeout": 3,
+        "error_message": "等待高级选项区域出现失败"
+      },
+      {
+        "type": "select",
+        "selector": "#theme",
+        "value": "深色",
+        "error_message": "选择主题失败"
+      },
+      {
+        "type": "click",
+        "selector": "#submitBtn",
+        "error_message": "点击提交按钮失败"
+      },
+      {
+        "type": "wait_appear",
+        "selector": "#loadingIndicator",
+        "timeout": 3,
+        "error_message": "等待加载指示器出现失败"
+      },
+      {
+        "type": "wait_disappear",
+        "selector": "#loadingIndicator",
+        "timeout": 15,
+        "error_message": "等待加载完成失败"
+      }
+    ]
+  },
+  {
+    "name": "拖拽功能测试",
+    "url": "http://localhost:8080/drag-and-drop",
+    "wait_time": 3,
+    "screenshot": true,
+    "actions": [
+      {
+        "type": "wait_appear",
+        "selector": "#drag-source-1",
+        "timeout": 5,
+        "error_message": "等待拖拽元素出现失败"
+      },
+      {
+        "type": "wait_appear",
+        "selector": "#drop-zone-1",
+        "timeout": 5,
+        "error_message": "等待放置区域出现失败"
+      },
+      {
+        "type": "drag_drop",
+        "selector": "#drag-source-1",
+        "target": "#drop-zone-1",
+        "error_message": "拖拽元素到放置区域失败"
+      },
+      {
+        "type": "wait_appear",
+        "selector": "#result-message",
+        "timeout": 5,
+        "error_message": "等待成功消息出现失败"
+      },
+      {
+        "type": "drag_drop",
+        "selector": "#drag-source-2",
+        "target": "#drop-zone-2",
+        "error_message": "拖拽第二个元素到第二个放置区域失败"
+      },
+      {
+        "type": "wait_appear",
+        "selector": "#high-priority",
+        "timeout": 3,
+        "error_message": "等待高优先级目标区域出现失败"
+      },
+      {
+        "type": "drag_drop",
+        "selector": ".draggable-item[data-value='urgent']",
+        "target": "#high-priority",
+        "error_message": "拖拽紧急标签到高优先级区域失败"
+      }
+    ]
+  },
+  {
+    "name": "信息获取测试",
+    "url": "http://localhost:8080/info-page",
+    "wait_time": 3,
+    "screenshot": true,
+    "actions": [
+      {
+        "type": "wait_appear",
+        "selector": "#product-name",
+        "timeout": 5,
+        "error_message": "等待产品名称出现失败"
+      },
+      {
+        "type": "get_text",
+        "selector": "#product-name",
+        "output_key": "productName",
+        "error_message": "获取产品名称失败"
+      },
+      {
+        "type": "get_text",
+        "selector": "#product-price",
+        "output_key": "productPrice",
+        "error_message": "获取产品价格失败"
+      },
+      {
+        "type": "get_attribute",
+        "selector": "#product-image",
+        "attribute": "src",
+        "output_key": "productImageSrc",
+        "error_message": "获取产品图片链接失败"
+      },
+      {
+        "type": "get_text",
+        "selector": "#rating-value",
+        "output_key": "ratingValue",
+        "error_message": "获取评分失败"
+      },
+      {
+        "type": "get_text",
+        "selector": "#product-brand",
+        "output_key": "productBrand",
+        "error_message": "获取产品品牌失败"
+      },
+      {
+        "type": "get_text",
+        "selector": "#product-model",
+        "output_key": "productModel",
+        "error_message": "获取产品型号失败"
+      },
+      {
+        "type": "click",
+        "selector": "#tab-specifications",
+        "error_message": "点击技术规格标签失败"
+      },
+      {
+        "type": "wait_appear",
+        "selector": "#tab-content-specifications",
+        "timeout": 3,
+        "error_message": "等待技术规格内容出现失败"
+      },
+      {
+        "type": "get_text",
+        "selector": "#spec-battery",
+        "output_key": "batteryLife",
+        "error_message": "获取电池续航信息失败"
+      },
+      {
+        "type": "click",
+        "selector": "#tab-reviews",
+        "error_message": "点击用户评价标签失败"
+      },
+      {
+        "type": "wait_appear",
+        "selector": "#reviews-section",
+        "timeout": 3,
+        "error_message": "等待评价区域出现失败"
+      },
+      {
+        "type": "get_text",
+        "selector": ".review-author",
+        "output_key": "firstReviewer",
+        "error_message": "获取第一个评价者姓名失败"
+      }
+    ]
+  },
+  {
+    "name": "交互功能测试",
+    "url": "http://localhost:8080/interactive-test",
+    "wait_time": 3,
+    "screenshot": true,
+    "actions": [
+      {
+        "type": "wait_appear",
+        "selector": "#show-hidden-btn",
+        "timeout": 5,
+        "error_message": "等待显示隐藏内容按钮出现失败"
+      },
+      {
+        "type": "click",
+        "selector": "#show-hidden-btn",
+        "error_message": "点击显示隐藏内容按钮失败"
+      },
+      {
+        "type": "wait_appear",
+        "selector": "#hidden-element",
+        "timeout": 3,
+        "error_message": "等待隐藏内容出现失败"
+      },
+      {
+        "type": "get_text",
+        "selector": "#hidden-element h3",
+        "output_key": "hiddenTitle",
+        "error_message": "获取隐藏内容标题失败"
+      },
+      {
+        "type": "click",
+        "selector": "#start-progress-btn",
+        "error_message": "点击开始加载按钮失败"
+      },
+      {
+        "type": "wait_appear",
+        "selector": "#loading-spinner",
+        "timeout": 3,
+        "error_message": "等待加载动画出现失败"
+      },
+      {
+        "type": "get_attribute",
+        "selector": "#progress-fill",
+        "attribute": "style",
+        "output_key": "progressStyle",
+        "error_message": "获取进度条样式失败"
+      },
+      {
+        "type": "right_click",
+        "selector": "#context-menu-target",
+        "error_message": "右键点击上下文菜单区域失败"
+      },
+      {
+        "type": "wait_appear",
+        "selector": "#context-menu",
+        "timeout": 3,
+        "error_message": "等待上下文菜单出现失败"
+      },
+      {
+        "type": "hover",
+        "selector": ".tooltip-target",
+        "error_message": "悬停在提示元素上失败"
+      },
+      {
+        "type": "click",
+        "selector": ".list-item[data-id='1']",
+        "error_message": "点击第一个选项失败"
+      },
+      {
+        "type": "click",
+        "selector": ".list-item[data-id='3']",
+        "error_message": "点击第三个选项失败"
+      },
+      {
+        "type": "click",
+        "selector": "#show-selection-btn",
+        "error_message": "点击显示选择按钮失败"
+      },
+      {
+        "type": "wait_appear",
+        "selector": "#selected-items",
+        "timeout": 3,
+        "error_message": "等待选择结果出现失败"
+      },
+      {
+        "type": "click",
+        "selector": "#show-modal-btn",
+        "error_message": "点击显示模态对话框按钮失败"
+      },
+      {
+        "type": "wait_appear",
+        "selector": "#modal",
+        "timeout": 3,
+        "error_message": "等待模态对话框出现失败"
+      },
+      {
+        "type": "click",
+        "selector": "#close-modal-btn",
+        "error_message": "点击关闭模态对话框按钮失败"
+      },
+      {
+        "type": "wait_disappear",
+        "selector": "#modal",
+        "timeout": 3,
+        "error_message": "等待模态对话框消失失败"
+      }
+    ]
+  }
+]
