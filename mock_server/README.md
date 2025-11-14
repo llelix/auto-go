@@ -27,13 +27,20 @@ go get -u github.com/gin-gonic/gin
 
 ### 2. 启动服务器
 
-Windows系统：
+有两种方式启动服务器：
+
+**方式一：使用auto-go的mock命令（推荐）**
 ```bash
-start.bat
+cd ..  # 返回auto-go根目录
+go run main.go mock
 ```
 
-或者直接运行：
+**方式二：直接运行mock服务器**
 ```bash
+# Windows系统
+start.bat
+
+# 或者直接运行
 go run main.go
 ```
 

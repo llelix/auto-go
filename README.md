@@ -29,7 +29,22 @@ go run main.go init
 
 这将创建默认的配置文件 `config.json` 和示例任务文件 `tasks.json`。
 
+### 3. 启动Mock服务器（可选）
 
+如果您需要测试auto-go的自动化功能，可以启动内置的Mock服务器：
+
+```bash
+# 使用默认设置启动Mock服务器（端口8080）
+go run main.go mock
+
+# 自定义端口
+go run main.go mock --port 3000
+
+# 指定模板目录
+go run main.go mock --templates custom/templates
+```
+
+Mock服务器提供了各种测试场景，包括表单填写、拖拽操作、信息获取等。详细说明请参考 [Mock服务器文档](mock_server/README.md)。
 
 ### 4. 执行自动化任务
 

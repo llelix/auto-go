@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	"fmt"
@@ -9,40 +9,17 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/urfave/cli/v2"
 )
 
-// CreateMockServerCommand 创建mock服务器命令
-func CreateMockServerCommand() *cli.Command {
-	return &cli.Command{
-		Name:  "mock",
-		Usage: "启动mock服务器，托管templates目录中的网页",
-		Flags: []cli.Flag{
-			&cli.IntFlag{
-				Name:    "port",
-				Aliases: []string{"p"},
-				Usage:   "服务器端口号",
-				Value:   8080,
-			},
-			&cli.StringFlag{
-				Name:    "templates",
-				Aliases: []string{"t"},
-				Usage:   "模板文件目录路径",
-				Value:   "mock_server/templates",
-			},
-		},
-		Action: executeMockServerCommand,
-	}
-}
-
-// executeMockServerCommand 执行mock服务器命令
-func executeMockServerCommand(c *cli.Context) error {
-	port := c.Int("port")
-	templatesDir := c.String("templates")
+func main() {
+	// 设置默认值
+	port := 8080
+	templatesDir := "templates"
 	
 	// 检查模板目录是否存在
 	if _, err := os.Stat(templatesDir); os.IsNotExist(err) {
-		return fmt.Errorf("模板目录不存在: %s", templatesDir)
+		fmt.Printf("错误: 模板目录不存在: %s\n", templatesDir)
+		os.Exit(1)
 	}
 	
 	// 设置 Gin 模式
@@ -196,7 +173,8 @@ func executeMockServerCommand(c *cli.Context) error {
 	// 获取当前工作目录
 	wd, err := os.Getwd()
 	if err != nil {
-		return fmt.Errorf("获取当前工作目录失败: %w", err)
+		fmt.Printf("错误: 获取当前工作目录失败: %v\n", err)
+		os.Exit(1)
 	}
 	
 	fmt.Printf("Mock Server 已启动\n")
@@ -214,6 +192,4 @@ func executeMockServerCommand(c *cli.Context) error {
 	
 	// 启动 HTTP 服务器
 	log.Fatal(r.Run(serverAddr))
-	
-	return nil
 }

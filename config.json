@@ -3,7 +3,7 @@
     "headless": false,
     "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
     "timeout": 30,
-    "executable_path": ""
+    "executable_path": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
   },
   "tasks": {
     "default_wait_time": 5,
