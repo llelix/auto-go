@@ -214,6 +214,8 @@ func (ce *ControlExecutor) executeControlNode(node *ControlNode) error {
 		return ce.executeForLoop(node)
 	case ControlTypeIfCondition:
 		return ce.executeIfCondition(node)
+	case ControlTypeElseCondition:
+		return ce.executeElseCondition(node)
 	// 移除了while循环，遵循要求只使用for循环
 	default:
 		return fmt.Errorf("不支持的控制节点类型: %s", node.Type)
@@ -327,6 +329,44 @@ func (ce *ControlExecutor) executeIfCondition(node *ControlNode) error {
 	}
 
 	log.Printf("❓ 条件判断执行完成")
+	return nil
+}
+
+// executeElseCondition 执行else分支（单层循环结构）
+func (ce *ControlExecutor) executeElseCondition(node *ControlNode) error {
+	log.Printf("❓ 开始执行else分支")
+
+	// 检查else分支是否有对应的if前置节点
+	// 这个验证应该在执行时进行，因为解码时无法确定执行顺序
+	
+	// 执行else分支的子节点
+	if len(node.Children) > 0 {
+		log.Printf("✅ 执行else分支")
+		// 使用单层循环结构执行子节点
+		for idx := 0; idx < len(node.Children); idx++ {
+			// 检查控制流信号
+			if ce.Context.ControlFlow.BreakSignal {
+				ce.Context.ResetControlFlow()
+				break
+			}
+			
+			if ce.Context.ControlFlow.ContinueSignal {
+				ce.Context.ResetControlFlow()
+				continue
+			}
+			
+			if err := ce.ExecuteNodeItem(node.Children[idx]); err != nil {
+				return err
+			}
+			
+			// 操作间添加短暂延迟
+			time.Sleep(500 * time.Millisecond)
+		}
+	} else {
+		log.Printf("❌ else分支无子节点，跳过")
+	}
+
+	log.Printf("❓ else分支执行完成")
 	return nil
 }
 

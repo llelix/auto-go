@@ -67,8 +67,7 @@
                 ]
             },
             {
-                "type": "if",
-                "condition": "pageTitle == '注册页面'",
+                "type": "else",
                 "children": [
                     {
                         "type": "fill",

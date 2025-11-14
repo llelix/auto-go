@@ -9,6 +9,7 @@ import (
 const (
 	ControlTypeForLoop     = "for"
 	ControlTypeIfCondition = "if"
+	ControlTypeElseCondition = "else"
 	ControlTypeWhileLoop   = "while"
 )
 
@@ -20,7 +21,7 @@ const (
 
 // ControlNode 流程控制节点基类
 type ControlNode struct {
-	Type     string      `json:"type"`     // 控制类型："for", "if", "while"
+	Type     string      `json:"type"`     // 控制类型："for", "if", "else", "while"
 	Children []NodeItem  `json:"children"` // 子节点，可以是Action或ControlNode
 	
 	// 循环参数
@@ -46,9 +47,7 @@ type WhileLoop struct {
 // IfCondition 定义条件分支结构
 type IfCondition struct {
 	ControlNode
-	Condition string     `json:"condition"`           // 条件表达式
-	Else      []NodeItem `json:"else,omitempty"`      // else分支
-	ElseIf    []IfCondition `json:"else_if,omitempty"` // elseif分支
+	Condition string `json:"condition"` // 条件表达式
 }
 
 // NodeItem 定义节点项，可以是Action或ControlNode
@@ -78,6 +77,8 @@ func (cn *ControlNode) IsValid() error {
 		return cn.validateForLoop()
 	case ControlTypeIfCondition:
 		return cn.validateIfCondition()
+	case ControlTypeElseCondition:
+		return cn.validateElseCondition()
 	case ControlTypeWhileLoop:
 		return cn.validateWhileLoop()
 	default:
@@ -100,6 +101,17 @@ func (cn *ControlNode) validateIfCondition() error {
 // validateWhileLoop 验证while循环配置
 func (cn *ControlNode) validateWhileLoop() error {
 	// 这里可以添加具体的验证逻辑
+	return nil
+}
+
+// validateElseCondition 验证else分支配置
+func (cn *ControlNode) validateElseCondition() error {
+	// 验证else节点必须有子节点
+	if len(cn.Children) == 0 {
+		return fmt.Errorf("else分支必须包含至少一个子节点")
+	}
+	// 在实际执行时，else节点需要检查前一个节点是否为if节点
+	// 这个验证在解码时无法完成，需要在执行时进行
 	return nil
 }
 
@@ -158,11 +170,11 @@ func (ni *NodeItem) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON NodeItem的自定义JSON反序列化
 func (ni *NodeItem) UnmarshalJSON(data []byte) error {
-	// 首先尝试解析为ControlNode（因为某些类型如"if"需要优先作为控制节点处理）
+	// 首先尝试解析为ControlNode（因为某些类型如"if", "else"需要优先作为控制节点处理）
 	var controlNode ControlNode
 	if err := json.Unmarshal(data, &controlNode); err == nil && controlNode.Type != "" {
 		// 检查是否为支持的控制节点类型
-		if controlNode.Type == ControlTypeForLoop || controlNode.Type == ControlTypeIfCondition || controlNode.Type == ControlTypeWhileLoop {
+		if controlNode.Type == ControlTypeForLoop || controlNode.Type == ControlTypeIfCondition || controlNode.Type == ControlTypeElseCondition || controlNode.Type == ControlTypeWhileLoop {
 			ni.ControlNode = &controlNode
 			return nil
 		}
