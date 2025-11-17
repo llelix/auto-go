@@ -20,7 +20,6 @@
       variable: "i"
       from: 1
       to: 5
-      step: 1
 
 - name: "条件分支测试"
   url: "http://localhost:8080/form-page"
@@ -101,12 +100,10 @@
               variable: "product"
               from: 1
               to: 10
-              step: 1
       
       variable: "category"
       from: 1
       to: 3
-      step: 1
 
 - name: "变量和条件组合测试"
   url: "http://localhost:8080/dashboard"
@@ -141,4 +138,3 @@
           variable: "index"
           from: 1
           to: "{{notificationCount}}"
-          step: 1

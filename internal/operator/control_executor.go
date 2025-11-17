@@ -216,7 +216,6 @@ func (ce *ControlExecutor) executeControlNode(node *ControlNode) error {
 		return ce.executeIfCondition(node)
 	case ControlTypeElseCondition:
 		return ce.executeElseCondition(node)
-	// 移除了while循环，遵循要求只使用for循环
 	default:
 		return fmt.Errorf("不支持的控制节点类型: %s", node.Type)
 	}
@@ -228,7 +227,7 @@ func (ce *ControlExecutor) executeForLoop(node *ControlNode) error {
 
 	// 解析循环参数
 	var loopVar string
-	var start, end, step int
+	var start, end int
 
 	// 从node中解析参数
 	loopVar = node.Variable
@@ -238,12 +237,8 @@ func (ce *ControlExecutor) executeForLoop(node *ControlNode) error {
 	
 	start = node.From
 	end = node.To
-	step = node.Step
-	if step == 0 {
-		step = 1 // 默认步长为1
-	}
 
-	log.Printf("🔄 循环参数: 变量=%s, 起始=%d, 结束=%d, 步长=%d", loopVar, start, end, step)
+	log.Printf("🔄 循环参数: 变量=%s, 起始=%d, 结束=%d", loopVar, start, end)
 
 	// 使用真正的单层循环结构，避免嵌套
 	currentIndex := start
@@ -285,11 +280,11 @@ func (ce *ControlExecutor) executeForLoop(node *ControlNode) error {
 		// 检查continue信号
 		if ce.Context.ControlFlow.ContinueSignal {
 			ce.Context.ResetControlFlow()
-			currentIndex += step
+			currentIndex++
 			continue
 		}
 
-		currentIndex += step
+		currentIndex++
 	}
 
 	log.Printf("🔄 for循环执行完成")

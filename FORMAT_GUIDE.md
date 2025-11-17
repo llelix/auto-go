@@ -78,7 +78,6 @@ Auto-Go项目已全面采用YAML格式作为任务配置的标准格式，相比
       variable: "i"
       from: 1
       to: 5
-      step: 1
       children:
         - type: "click"
           selector: ".button-{{i}}"

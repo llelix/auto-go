@@ -10,45 +10,23 @@ const (
 	ControlTypeForLoop     = "for"
 	ControlTypeIfCondition = "if"
 	ControlTypeElseCondition = "else"
-	ControlTypeWhileLoop   = "while"
 )
 
-// ControlFlowType 定义控制流类型
-const (
-	ControlFlowBreak    = "break"
-	ControlFlowContinue = "continue"
-)
+
 
 // ControlNode 流程控制节点基类
 type ControlNode struct {
-	Type     string      `json:"type"`     // 控制类型："for", "if", "else", "while"
+	Type     string      `json:"type"`     // 控制类型："for", "if", "else"
 	Children []NodeItem  `json:"children"` // 子节点，可以是Action或ControlNode
 	
 	// 循环参数
 	Variable  string `json:"variable,omitempty"`  // 循环变量名
 	From      int    `json:"from,omitempty"`       // 起始值
 	To        int    `json:"to,omitempty"`         // 结束值
-	Step      int    `json:"step,omitempty"`       // 步长，默认1
 	Condition string `json:"condition,omitempty"`  // 条件表达式
 }
 
-// ForLoop 定义for循环结构（已弃用，参数直接集成到ControlNode中）
-type ForLoop struct {
-	ControlNode
-}
 
-// WhileLoop 定义while循环结构（已弃用，只保留for循环）
-type WhileLoop struct {
-	ControlNode
-	Condition string `json:"condition"` // 循环条件表达式
-	MaxIter   int    `json:"max_iter"`  // 最大迭代次数，防止无限循环
-}
-
-// IfCondition 定义条件分支结构
-type IfCondition struct {
-	ControlNode
-	Condition string `json:"condition"` // 条件表达式
-}
 
 // NodeItem 定义节点项，可以是Action或ControlNode
 type NodeItem struct {
@@ -79,8 +57,6 @@ func (cn *ControlNode) IsValid() error {
 		return cn.validateIfCondition()
 	case ControlTypeElseCondition:
 		return cn.validateElseCondition()
-	case ControlTypeWhileLoop:
-		return cn.validateWhileLoop()
 	default:
 		return fmt.Errorf("不支持的流程控制类型: %s", cn.Type)
 	}
@@ -98,11 +74,7 @@ func (cn *ControlNode) validateIfCondition() error {
 	return nil
 }
 
-// validateWhileLoop 验证while循环配置
-func (cn *ControlNode) validateWhileLoop() error {
-	// 这里可以添加具体的验证逻辑
-	return nil
-}
+
 
 // validateElseCondition 验证else分支配置
 func (cn *ControlNode) validateElseCondition() error {
@@ -174,7 +146,7 @@ func (ni *NodeItem) UnmarshalJSON(data []byte) error {
 	var controlNode ControlNode
 	if err := json.Unmarshal(data, &controlNode); err == nil && controlNode.Type != "" {
 		// 检查是否为支持的控制节点类型
-		if controlNode.Type == ControlTypeForLoop || controlNode.Type == ControlTypeIfCondition || controlNode.Type == ControlTypeElseCondition || controlNode.Type == ControlTypeWhileLoop {
+		if controlNode.Type == ControlTypeForLoop || controlNode.Type == ControlTypeIfCondition || controlNode.Type == ControlTypeElseCondition {
 			ni.ControlNode = &controlNode
 			return nil
 		}
@@ -196,7 +168,7 @@ func (ni *NodeItem) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var controlNode ControlNode
 	if err := unmarshal(&controlNode); err == nil && controlNode.Type != "" {
 		// 检查是否为支持的控制节点类型
-		if controlNode.Type == ControlTypeForLoop || controlNode.Type == ControlTypeIfCondition || controlNode.Type == ControlTypeElseCondition || controlNode.Type == ControlTypeWhileLoop {
+		if controlNode.Type == ControlTypeForLoop || controlNode.Type == ControlTypeIfCondition || controlNode.Type == ControlTypeElseCondition {
 			ni.ControlNode = &controlNode
 			return nil
 		}
