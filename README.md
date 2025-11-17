@@ -7,7 +7,7 @@
 - ✅ **Chrome浏览器自动化** - 基于Playwright的无头浏览器操作
 - ✅ **灵活操作序列** - 支持点击、填写、滚动、拖拽、等待等多种元素操作
 - ✅ **智能元素交互** - 支持CSS选择器定位、文本获取、属性获取等高级功能
-- ✅ **任务配置管理** - JSON格式的任务配置文件，支持自定义操作序列
+- ✅ **任务配置管理** - YAML格式的任务配置文件，支持自定义操作序列（YAML格式更清晰易读）
 - ✅ **截图功能** - 自动截取操作过程截图
 - ✅ **批量任务执行** - 支持批量执行多个自动化任务
 - ✅ **命令行界面** - 友好的命令行操作界面
@@ -31,7 +31,17 @@ go mod download
 go run main.go init
 ```
 
-这将创建默认的配置文件 `config.json` 和示例任务文件 `tasks.json`。
+这将创建默认的配置文件 `config.json` 和示例任务文件 `tasks.yaml`。
+
+## YAML格式优势
+
+项目已全面迁移到YAML格式配置，相比JSON具有以下优势：
+
+- **可读性更强**: 支持注释、多行字符串、更简洁的语法
+- **支持多行文本**: 便于编写复杂的CSS选择器或多行文本内容
+- **更好的数据类型支持**: 自动处理布尔值、数字、字符串等类型
+- **注释功能**: 可以在配置文件中添加说明和注释
+- **结构更清晰**: 缩进语法使嵌套结构更易读
 
 ### 3. 启动Mock服务器（可选）
 
@@ -55,7 +65,7 @@ go run main.go run
 go run main.go run --interactive
 
 # 指定配置文件
-go run main.go run --config custom-config.json --tasks my-tasks.json
+go run main.go run --config custom-config.json --tasks my-tasks.yaml
 ```
 
 ## 配置文件说明
@@ -81,89 +91,77 @@ go run main.go run --config custom-config.json --tasks my-tasks.json
 }
 ```
 
-### 基础任务配置 (tasks.json)
+### 基础任务配置 (tasks.yaml)
 
-```json
-[
-  {
-    "name": "简单表单测试",
-    "url": "http://localhost:8080/simple-form",
-    "wait_time": 3,
-    "screenshot": true,
-    "actions": [
-      {
-        "type": "wait_appear",
-        "selector": "#name",
-        "timeout": 5,
-        "error_message": "等待姓名输入框出现失败"
-      },
-      {
-        "type": "fill",
-        "selector": "#name",
-        "value": "测试用户",
-        "error_message": "填写姓名失败"
-      },
-      {
-        "type": "fill",
-        "selector": "#email",
-        "value": "test@example.com",
-        "error_message": "填写邮箱失败"
-      },
-      {
-        "type": "fill",
-        "selector": "#phone",
-        "value": "13800138000",
-        "error_message": "填写电话失败"
-      },
-      {
-        "type": "fill",
-        "selector": "#message",
-        "value": "这是一个测试消息，用于验证auto-go的表单填写功能。",
-        "error_message": "填写消息失败"
-      }
-      ]
-    }
-]
+```yaml
+- name: "简单表单测试"
+  url: "http://localhost:8080/simple-form"
+  wait_time: 3
+  screenshot: true
+  actions:
+    - type: "wait_appear"
+      selector: "#name"
+      timeout: 5
+      error_message: "等待姓名输入框出现失败"
+    
+    - type: "fill"
+      selector: "#name"
+      value: "测试用户"
+      error_message: "填写姓名失败"
+    
+    - type: "fill"
+      selector: "#email"
+      value: "test@example.com"
+      error_message: "填写邮箱失败"
+    
+    - type: "fill"
+      selector: "#phone"
+      value: "13800138000"
+      error_message: "填写电话失败"
+    
+    - type: "fill"
+      selector: "#message"
+      value: |
+        这是一个测试消息，用于验证auto-go的表单填写功能。
+        多行文本在YAML中更加清晰易读。
+      error_message: "填写消息失败"
 ```
 
-### 流程控制任务配置 (tasks_with_control.json)
+**YAML格式优势展示**:
+- 使用缩进替代大括号，结构更清晰
+- 支持多行文本（`|`符号）
+- 注释更加方便（以`#`开头）
+- 省略了引号和逗号，语法更简洁
 
-```json
-[
-  {
-    "name": "带流程控制的任务",
-    "url": "http://localhost:8080/test-page",
-    "actions": [
-      {
-        "type": "for",
-        "children": [
-          {
-            "type": "click",
-            "selector": ".button-{{i}}",
-            "error_message": "点击按钮 {{i}} 失败"
-          }
-        ],
-        "variable": "i",
-        "from": 1,
-        "to": 5,
-        "step": 1
-      },
-      {
-        "type": "if",
-        "condition": "pageTitle == '登录页面'",
-        "children": [
-          {
-            "type": "fill",
-            "selector": "#username",
-            "value": "testuser",
-            "error_message": "填写用户名失败"
-          }
-        ]
-      }
-    ]
-  }
-]
+### 流程控制任务配置 (tasks_with_control.yaml)
+
+```yaml
+- name: "带流程控制的任务"
+  url: "http://localhost:8080/test-page"
+  actions:
+    - type: "for"
+      variable: "i"
+      from: 1
+      to: 5
+      step: 1
+      children:
+        - type: "click"
+          selector: ".button-{{i}}"
+          error_message: "点击按钮 {{i}} 失败"
+    
+    - type: "if"
+      condition: "pageTitle == '登录页面'"
+      children:
+        - type: "fill"
+          selector: "#username"
+          value: "testuser"
+          error_message: "填写用户名失败"
 ```
+
+**YAML复杂结构优势**:
+- 嵌套结构通过缩进更直观
+- 逻辑关系更清晰，易于理解和维护
+- 便于添加注释说明每个块的用途
 
 ## 任务配置字段说明
 
@@ -248,9 +246,26 @@ auto-go/
 │   └── time/
 │       └── time.go
 ├── config.json             # 应用配置文件
-├── tasks.json              # 任务配置文件
+├── tasks.yaml              # 任务配置文件 (YAML格式)
+├── tasks_sequence.yaml     # 序列任务配置
+├── tasks_with_control.yaml # 流程控制任务配置
 └── README.md
 ```
+
+### YAML文件格式说明
+
+项目现已全面使用YAML格式配置任务，支持以下文件类型：
+
+- `tasks.yaml` - 基础任务配置
+- `tasks_sequence.yaml` - 序列任务配置
+- `tasks_with_control.yaml` - 流程控制任务配置
+
+**YAML语法特点**:
+- 使用缩进表示层级关系（通常2个空格）
+- 以`#`开头表示注释
+- 支持多行字符串（使用`|`符号）
+- 布尔值可以用`true/false`或`yes/no`
+- 自动类型推断，无需引号包装简单字符串
 
 ### 扩展自定义操作
 
@@ -287,7 +302,10 @@ A: 使用交互模式运行，观察浏览器实际页面元素结构。
 A: 调整 `wait_time` 参数，或在配置中减少截图等非必要操作。
 
 ### Q: 如何使用流程控制功能？
-A: 参考 `tasks_with_control.json` 示例文件，使用for循环和if条件分支构建复杂自动化流程。
+A: 参考 `tasks_with_control.yaml` 示例文件，使用for循环和if条件分支构建复杂自动化流程。
+
+### Q: YAML文件格式有什么要求？
+A: YAML文件必须使用UTF-8编码，缩进使用2个空格（不要使用tab），确保格式正确。可以使用在线YAML验证工具检查语法。
 
 ### Q: 如何调试表达式求值？
 A: 在控制执行器中启用详细日志，查看变量赋值和表达式求值结果。

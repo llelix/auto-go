@@ -52,8 +52,8 @@ type IfCondition struct {
 
 // NodeItem 定义节点项，可以是Action或ControlNode
 type NodeItem struct {
-	Action      *Action      `json:"action,omitempty"`       // 基本操作
-	ControlNode *ControlNode `json:"control_node,omitempty"` // 控制节点
+	Action      *Action      `json:"action,omitempty" yaml:"action,omitempty"`       // 基本操作
+	ControlNode *ControlNode `json:"control_node,omitempty" yaml:"control_node,omitempty"` // 控制节点
 }
 
 // ExecutionContext 执行上下文，用于存储变量和控制流状态
@@ -183,6 +183,28 @@ func (ni *NodeItem) UnmarshalJSON(data []byte) error {
 	// 尝试解析为Action
 	var action Action
 	if err := json.Unmarshal(data, &action); err == nil && action.Type != "" {
+		ni.Action = &action
+		return nil
+	}
+
+	return fmt.Errorf("无法解析节点项，既不是有效的Action也不是ControlNode")
+}
+
+// UnmarshalYAML NodeItem的自定义YAML反序列化
+func (ni *NodeItem) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	// 首先尝试解析为ControlNode
+	var controlNode ControlNode
+	if err := unmarshal(&controlNode); err == nil && controlNode.Type != "" {
+		// 检查是否为支持的控制节点类型
+		if controlNode.Type == ControlTypeForLoop || controlNode.Type == ControlTypeIfCondition || controlNode.Type == ControlTypeElseCondition || controlNode.Type == ControlTypeWhileLoop {
+			ni.ControlNode = &controlNode
+			return nil
+		}
+	}
+
+	// 尝试解析为Action
+	var action Action
+	if err := unmarshal(&action); err == nil && action.Type != "" {
 		ni.Action = &action
 		return nil
 	}

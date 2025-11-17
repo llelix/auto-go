@@ -1,0 +1,144 @@
+# AutoGo 带控制逻辑的任务配置文件 - YAML格式
+# 支持循环、条件分支等高级流程控制
+
+- name: "基础循环测试"
+  url: "http://localhost:8080/test-page"
+  wait_time: 3
+  screenshot: true
+  actions:
+    - type: "for"
+      children:
+        - type: "click"
+          selector: "#button-{{i}}"
+          error_message: "点击按钮 {{i}} 失败"
+        
+        - type: "wait_appear"
+          selector: "#result-{{i}}"
+          timeout: 5
+          error_message: "等待结果 {{i}} 出现失败"
+      
+      variable: "i"
+      from: 1
+      to: 5
+      step: 1
+
+- name: "条件分支测试"
+  url: "http://localhost:8080/form-page"
+  wait_time: 3
+  screenshot: true
+  actions:
+    - type: "get_text"
+      selector: "#page-title"
+      output_key: "pageTitle"
+    
+    - type: "if"
+      condition: "pageTitle == '登录页面'"
+      children:
+        - type: "fill"
+          selector: "#username"
+          value: "testuser"
+          error_message: "填写用户名失败"
+        
+        - type: "fill"
+          selector: "#password"
+          value: "testpass"
+          error_message: "填写密码失败"
+        
+        - type: "click"
+          selector: "#login-btn"
+          error_message: "点击登录按钮失败"
+        
+        - type: "click"
+          selector: ".switch-link a:last-child"
+          error_message: "点击切换注册按钮失败"
+    
+    - type: "else"
+      children:
+        - type: "fill"
+          selector: "#reg-email"
+          value: "test@example.com"
+          error_message: "填写邮箱失败"
+        
+        - type: "fill"
+          selector: "#reg-username"
+          value: "newuser"
+          error_message: "填写用户名失败"
+        
+        - type: "click"
+          selector: "#register-btn"
+          error_message: "点击注册按钮失败"
+
+- name: "嵌套控制结构测试"
+  url: "http://localhost:8080/catalog"
+  wait_time: 3
+  screenshot: true
+  actions:
+    - type: "for"
+      children:
+        - type: "get_text"
+          selector: ".category-{{category}}"
+          output_key: "categoryName"
+        
+        - type: "if"
+          condition: "categoryName == '电子产品'"
+          children:
+            - type: "for"
+              children:
+                - type: "click"
+                  selector: ".product-{{product}}"
+                  error_message: "点击产品 {{product}} 失败"
+                
+                - type: "get_text"
+                  selector: "#product-name"
+                  output_key: "productName"
+                
+                - type: "if"
+                  condition: "productName == 'iPhone'"
+                  children:
+                    - type: "break"
+                      error_message: "停止循环"
+              
+              variable: "product"
+              from: 1
+              to: 10
+              step: 1
+      
+      variable: "category"
+      from: 1
+      to: 3
+      step: 1
+
+- name: "变量和条件组合测试"
+  url: "http://localhost:8080/dashboard"
+  wait_time: 3
+  screenshot: true
+  actions:
+    - type: "get_text"
+      selector: "#user-role"
+      output_key: "userRole"
+    
+    - type: "get_text"
+      selector: "#notification-count"
+      output_key: "notificationCount"
+    
+    - type: "if"
+      children:
+        - type: "click"
+          selector: "#notifications"
+          error_message: "点击通知按钮失败"
+        
+        - type: "for"
+          children:
+            - type: "click"
+              selector: ".notification-{{index}}"
+              error_message: "点击通知 {{index}} 失败"
+            
+            - type: "if"
+              children:
+                - type: "continue"
+                  error_message: "跳过剩余通知"
+          
+          variable: "index"
+          from: 1
+          to: "{{notificationCount}}"
+          step: 1

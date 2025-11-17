@@ -1,12 +1,12 @@
 package operator
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"time"
 
 	"github.com/mike/auto-go/internal/logger"
+	"gopkg.in/yaml.v3"
 )
 
 // ActionType 定义操作类型
@@ -158,19 +158,35 @@ func (tm *TaskManager) SaveTaskResults(results []logger.TaskResult, filename str
 	return logger.SaveTaskResults(results, filename)
 }
 
-// LoadTasksFromFile 从JSON文件加载任务配置
+// LoadTasksFromFile 从YAML文件加载任务配置
 func LoadTasksFromFile(filename string) ([]Task, error) {
-	file, err := os.Open(filename)
+	content, err := os.ReadFile(filename)
 	if err != nil {
-		return nil, fmt.Errorf("打开任务文件失败: %w", err)
+		return nil, fmt.Errorf("读取YAML文件失败: %w", err)
 	}
-	defer file.Close()
 
+	// 首先尝试直接解析为Task数组
 	var tasks []Task
+	if err := yaml.Unmarshal(content, &tasks); err != nil {
+		return nil, fmt.Errorf("YAML解码失败: %w", err)
+	}
 
-	decoder := json.NewDecoder(file)
-	if err := decoder.Decode(&tasks); err != nil {
-		return nil, fmt.Errorf("解码任务文件失败: %w", err)
+	// 将每个任务中的Action数组转换为NodeItem数组
+	for i := range tasks {
+		if len(tasks[i].Actions) > 0 {
+			// 检查第一个元素是否是有效的NodeItem
+			// 如果不是有效的NodeItem，说明是直接的Action对象
+			if !tasks[i].Actions[0].IsAction() && !tasks[i].Actions[0].IsControlNode() {
+				// 这种情况说明YAML解码没有正确创建NodeItem包装器
+				// 我们需要手动创建NodeItem数组
+				var nodeItems []NodeItem
+				for _, action := range tasks[i].Actions {
+					// 创建一个新的NodeItem并设置Action字段
+					nodeItems = append(nodeItems, NodeItem{Action: action.Action})
+				}
+				tasks[i].Actions = nodeItems
+			}
+		}
 	}
 
 	return tasks, nil
