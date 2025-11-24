@@ -73,6 +73,7 @@ npm run dev
 ![编辑器界面](screenshots/editor.png)
 
 ## 开发
+task_sample.yaml是样例
 
 ### 可用命令
 
