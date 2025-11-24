@@ -1,0 +1,65 @@
+# AutoGo 示例配置文件
+# 这是一个演示用的YAML配置
+
+- name: "登录测试"
+  url: "https://example.com/login"
+  wait_time: 2
+  screenshot: true
+  actions:
+    - type: "wait_appear"
+      selector: "#username"
+      timeout: 5
+      error_message: "等待用户名输入框出现失败"
+    
+    - type: "fill"
+      selector: "#username"
+      value: "testuser"
+      error_message: "填写用户名失败"
+    
+    - type: "fill"
+      selector: "#password"
+      value: "password123"
+      error_message: "填写密码失败"
+    
+    - type: "click"
+      selector: "#login-btn"
+      error_message: "点击登录按钮失败"
+    
+    - type: "wait_appear"
+      selector: ".dashboard"
+      timeout: 10
+      error_message: "等待登录成功页面出现失败"
+
+- name: "表单提交测试"
+  url: "https://example.com/form"
+  wait_time: 3
+  screenshot: true
+  actions:
+    - type: "wait_appear"
+      selector: "#form-container"
+      timeout: 5
+      error_message: "等待表单容器出现失败"
+    
+    - type: "fill"
+      selector: "#name"
+      value: "张三"
+      error_message: "填写姓名失败"
+    
+    - type: "fill"
+      selector: "#email"
+      value: "zhangsan@example.com"
+      error_message: "填写邮箱失败"
+    
+    - type: "select"
+      selector: "#country"
+      value: "中国"
+      error_message: "选择国家失败"
+    
+    - type: "click"
+      selector: "#submit-btn"
+      error_message: "点击提交按钮失败"
+    
+    - type: "wait_disappear"
+      selector: "#submit-btn"
+      timeout: 15
+      error_message: "等待提交完成失败"
