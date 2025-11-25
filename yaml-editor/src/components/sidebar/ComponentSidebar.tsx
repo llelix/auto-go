@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { SafeDraggable } from '../SafeDraggable';
 
 export function ComponentSidebar() {
   return (
@@ -16,29 +17,29 @@ export function ComponentSidebar() {
         <div className="space-y-4">
           <div className="text-slate-300 font-medium text-sm">基础操作</div>
           
-          <div className="flex items-center gap-3 p-3 bg-slate-700 hover:bg-slate-600 rounded-lg cursor-move transition-all border border-slate-600 hover:border-slate-500">
-            <div className="text-2xl">⏳</div>
-            <div className="flex-1 min-w-0">
-              <div className="text-white font-medium text-sm">等待出现</div>
-              <div className="text-slate-400 text-xs mt-1">等待元素出现在页面上</div>
-            </div>
-          </div>
+          <SafeDraggable
+            id="wait-appear"
+            type="wait_appear"
+            icon="⏳"
+            title="等待出现"
+            description="等待元素出现在页面上"
+          />
 
-          <div className="flex items-center gap-3 p-3 bg-slate-700 hover:bg-slate-600 rounded-lg cursor-move transition-all border border-slate-600 hover:border-slate-500">
-            <div className="text-2xl">👆</div>
-            <div className="flex-1 min-w-0">
-              <div className="text-white font-medium text-sm">点击</div>
-              <div className="text-slate-400 text-xs mt-1">点击页面元素</div>
-            </div>
-          </div>
+          <SafeDraggable
+            id="click"
+            type="click"
+            icon="👆"
+            title="点击"
+            description="点击页面元素"
+          />
 
-          <div className="flex items-center gap-3 p-3 bg-slate-700 hover:bg-slate-600 rounded-lg cursor-move transition-all border border-slate-600 hover:border-slate-500">
-            <div className="text-2xl">✏️</div>
-            <div className="flex-1 min-w-0">
-              <div className="text-white font-medium text-sm">填写</div>
-              <div className="text-slate-400 text-xs mt-1">在输入框中填写内容</div>
-            </div>
-          </div>
+          <SafeDraggable
+            id="fill"
+            type="fill"
+            icon="✏️"
+            title="填写"
+            description="在输入框中填写内容"
+          />
         </div>
       </div>
 

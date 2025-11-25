@@ -1,0 +1,18 @@
+# AutoGo 任务配置文件
+# 测试导入功能
+
+- name: "自动化测试任务"
+  url: "https://example.com"
+  wait_time: 3
+  screenshot: true
+  actions:
+    - type: "wait_appear"
+      selector: "#element"
+      timeout: 5
+      error_message: "等待元素出现失败"
+    - type: "click"
+      selector: "#button"
+      wait_before: 1
+    - type: "fill"
+      selector: "#input"
+      value: "测试文本"

@@ -1,115 +1,173 @@
 'use client';
 
-import React from 'react';
+import { useState } from 'react';
+import { ComponentSidebar } from './sidebar/ComponentSidebar';
+import { DroppableCanvas } from './canvas/DroppableCanvas';
+import { YamlPreview } from './preview/YamlPreview';
+import { Toolbar } from './ui/Toolbar';
+
+interface DroppedItem {
+  id: string;
+  type: string;
+  title: string;
+  description: string;
+  x: number;
+  y: number;
+}
 
 export function YamlEditor() {
-  return (
-    <div className="h-screen w-full bg-slate-900 flex flex-col overflow-hidden">
-      {/* 顶部工具栏 */}
-      <div className="h-14 bg-slate-800 border-b border-slate-700 flex items-center justify-between px-4">
-        <div className="flex items-center gap-2">
-          <h1 className="text-lg font-semibold text-white">YAML 可视化编辑器</h1>
-        </div>
-        <div className="flex items-center gap-4">
-          <button className="flex items-center gap-2 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded-md transition-colors text-sm">
-            导入
-          </button>
-          <button className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-md transition-colors text-sm">
-            导出
-          </button>
-        </div>
-      </div>
+  const [droppedItems, setDroppedItems] = useState<DroppedItem[]>([]);
 
-      {/* 主编辑区域 */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* 左侧组件库 */}
-        <div className="w-80 bg-slate-800 border-r border-slate-700 flex-shrink-0">
-          <div className="h-full flex flex-col">
-            <div className="p-4 border-b border-slate-700">
-              <h2 className="text-white font-semibold text-lg">组件库</h2>
-              <p className="text-slate-400 text-sm mt-1">拖拽组件到画布中创建操作</p>
-            </div>
-            
-            <div className="flex-1 overflow-y-auto p-4">
-              <div className="space-y-4">
-                <div className="text-slate-300 font-medium text-sm">基础操作</div>
-                
-                <div className="flex items-center gap-3 p-3 bg-slate-700 hover:bg-slate-600 rounded-lg cursor-move transition-all border border-slate-600 hover:border-slate-500">
-                  <div className="text-2xl">⏳</div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-white font-medium text-sm">等待出现</div>
-                    <div className="text-slate-400 text-xs mt-1">等待元素出现在页面上</div>
-                  </div>
-                </div>
+  // 解析YAML文件
+  const parseYamlFile = (content: string): DroppedItem[] => {
+    try {
+      // 简单的YAML解析器，提取action项
+      const lines = content.split('\n');
+      const items: DroppedItem[] = [];
+      let index = 0;
 
-                <div className="flex items-center gap-3 p-3 bg-slate-700 hover:bg-slate-600 rounded-lg cursor-move transition-all border border-slate-600 hover:border-slate-500">
-                  <div className="text-2xl">👆</div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-white font-medium text-sm">点击</div>
-                    <div className="text-slate-400 text-xs mt-1">点击页面元素</div>
-                  </div>
-                </div>
+      lines.forEach((line) => {
+        if (line.trim().startsWith('- type:')) {
+          const type = line.trim().replace('- type:', '').trim().replace(/"/g, '');
+          
+          // 根据type创建对应的组件
+          const componentMap = {
+            'wait_appear': { title: '等待出现', description: '等待元素出现在页面上', icon: '⏳' },
+            'click': { title: '点击', description: '点击页面元素', icon: '👆' },
+            'fill': { title: '填写', description: '在输入框中填写内容', icon: '✏️' }
+          };
 
-                <div className="flex items-center gap-3 p-3 bg-slate-700 hover:bg-slate-600 rounded-lg cursor-move transition-all border border-slate-600 hover:border-slate-500">
-                  <div className="text-2xl">✏️</div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-white font-medium text-sm">填写</div>
-                    <div className="text-slate-400 text-xs mt-1">在输入框中填写内容</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+          const config = componentMap[type as keyof typeof componentMap];
+          if (config) {
+            items.push({
+              id: `${type}-imported-${index++}`,
+              type,
+              title: config.title,
+              description: config.description,
+              x: 100 + (items.length % 3) * 220,
+              y: 50 + Math.floor(items.length / 3) * 120
+            });
+          }
+        }
+      });
 
-            <div className="p-4 border-t border-slate-700 bg-slate-750">
-              <div className="text-slate-400 text-xs space-y-1">
-                <div>💡 提示：</div>
-                <div>• 拖拽组件到画布添加操作</div>
-                <div>• 双击节点编辑属性</div>
-                <div>• 拖拽节点边缘连接流程</div>
-              </div>
-            </div>
-          </div>
-        </div>
+      return items;
+    } catch (error) {
+      console.error('YAML解析失败:', error);
+      return [];
+    }
+  };
 
-        {/* 中间画布区域 */}
-        <div className="flex-1 bg-slate-950 relative overflow-hidden flex items-center justify-center">
-          <div className="text-center">
-            <h2 className="text-white text-xl mb-2">画布区域</h2>
-            <p className="text-slate-400">从左侧拖拽组件到此处</p>
-          </div>
-        </div>
+  // 处理文件导入
+  const handleImport = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const content = e.target?.result as string;
+      if (content) {
+        const parsedItems = parseYamlFile(content);
+        if (parsedItems.length > 0) {
+          setDroppedItems(parsedItems);
+          alert(`成功导入 ${parsedItems.length} 个组件`);
+        } else {
+          alert('未能从文件中识别到有效的组件配置');
+        }
+      }
+    };
+    reader.onerror = () => {
+      alert('文件读取失败');
+    };
+    reader.readAsText(file);
+  };
 
-        {/* 右侧预览面板 */}
-        <div className="w-96 bg-slate-800 border-l border-slate-700 flex-shrink-0">
-          <div className="h-full flex flex-col">
-            <div className="p-4 border-b border-slate-700 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <h2 className="text-white font-semibold">YAML 预览</h2>
-              </div>
-              <button className="flex items-center gap-2 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded-md transition-colors text-sm">
-                复制
-              </button>
-            </div>
+  // 处理文件导出
+  const handleExport = () => {
+    const yamlContent = generateYamlFromItems(droppedItems);
+    const blob = new Blob([yamlContent], { type: 'text/yaml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'autogo-config.yaml';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
-            <div className="flex-1 overflow-hidden">
-              <div className="h-full overflow-auto p-4 text-sm font-mono text-slate-300 bg-slate-950">
-                <pre>
-                  <code>{`# AutoGo 任务配置文件
-# 从左侧拖拽组件开始创建配置
+  // 根据组件生成YAML
+  const generateYamlFromItems = (items: DroppedItem[]): string => {
+    if (items.length === 0) {
+      return `# AutoGo 任务配置文件
+# 空配置
 
 - name: "示例任务"
   url: "https://example.com"
   wait_time: 3
   screenshot: true
-  actions:
-    - type: "wait_appear"
+  actions: []`;
+    }
+
+    const yamlActions = items.map(item => {
+      let actionConfig = `    - type: "${item.type}"`;
+      
+      switch (item.type) {
+        case 'wait_appear':
+          actionConfig += `
       selector: "#element"
       timeout: 5
-      error_message: "等待元素出现失败"`}</code>
-                </pre>
-              </div>
-            </div>
-          </div>
+      error_message: "等待元素出现失败"`;
+          break;
+        case 'click':
+          actionConfig += `
+      selector: "#button"
+      wait_before: 1`;
+          break;
+        case 'fill':
+          actionConfig += `
+      selector: "#input"
+      value: "示例文本"`;
+          break;
+        default:
+          actionConfig += `
+      selector: "#element"`;
+      }
+      
+      return actionConfig;
+    }).join('\n');
+
+    return `# AutoGo 任务配置文件
+# 通过拖拽组件创建的任务配置
+
+- name: "自动化任务"
+  url: "https://example.com"
+  wait_time: 3
+  screenshot: true
+  actions:
+${yamlActions}`;
+  };
+
+  return (
+    <div className="h-screen w-full bg-slate-900 flex flex-col overflow-hidden">
+      {/* 顶部工具栏 */}
+      <Toolbar onImport={handleImport} onExport={handleExport} />
+
+      {/* 主编辑区域 */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* 左侧组件库 */}
+        <div className="w-80 bg-slate-800 border-r border-slate-700 flex-shrink-0">
+          <ComponentSidebar />
+        </div>
+
+        {/* 中间画布区域 */}
+        <div className="flex-1 bg-slate-950 relative overflow-hidden">
+          <DroppableCanvas 
+            items={droppedItems} 
+            onItemsChange={setDroppedItems}
+          />
+        </div>
+
+        {/* 右侧预览面板 */}
+        <div className="w-96 bg-slate-800 border-l border-slate-700 flex-shrink-0">
+          <YamlPreview items={droppedItems} />
         </div>
       </div>
     </div>

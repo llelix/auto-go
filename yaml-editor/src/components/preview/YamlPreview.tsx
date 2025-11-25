@@ -1,39 +1,78 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Copy, Check, FileText, AlertCircle } from 'lucide-react';
-import { useEditorStore } from '@/lib/store/editor-store';
-import { YamlParser } from '@/lib/yaml-parser/parser';
+import { useState } from 'react';
+import { Copy, Check, FileText } from 'lucide-react';
+import { DroppedItem } from '../canvas/DroppableCanvas';
 
-export function YamlPreview() {
-  const { yamlOutput, tasks } = useEditorStore();
+interface YamlPreviewProps {
+  items: DroppedItem[];
+}
+
+export function YamlPreview({ items }: YamlPreviewProps) {
   const [copied, setCopied] = useState(false);
-  const [validation, setValidation] = useState<{ valid: boolean; errors: string[] } | null>(null);
 
-  // 验证配置
-  useEffect(() => {
-    if (tasks.length > 0) {
-      const result = YamlParser.validateConfig(tasks);
-      // 使用 setTimeout 避免同步调用 setState
-      const timeoutId = setTimeout(() => {
-        setValidation(result);
-      }, 0);
-      
-      return () => clearTimeout(timeoutId);
-    } else {
-      // 使用 setTimeout 避免同步调用 setState
-      const timeoutId = setTimeout(() => {
-        setValidation(null);
-      }, 0);
-      
-      return () => clearTimeout(timeoutId);
+  // 生成YAML内容
+  const generateYaml = () => {
+    if (items.length === 0) {
+      return `# AutoGo 任务配置文件
+# 从左侧拖拽组件开始创建配置
+
+- name: "示例任务"
+  url: "https://example.com"
+  wait_time: 3
+  screenshot: true
+  actions:
+    - type: "wait_appear"
+      selector: "#element"
+      timeout: 5
+      error_message: "等待元素出现失败"`;
     }
-  }, [tasks]);
+
+    const yamlActions = items.map(item => {
+      let actionConfig = `    - type: "${item.type}"`;
+      
+      switch (item.type) {
+        case 'wait_appear':
+          actionConfig += `
+      selector: "#element"
+      timeout: 5
+      error_message: "等待元素出现失败"`;
+          break;
+        case 'click':
+          actionConfig += `
+      selector: "#button"
+      wait_before: 1`;
+          break;
+        case 'fill':
+          actionConfig += `
+      selector: "#input"
+      value: "示例文本"`;
+          break;
+        default:
+          actionConfig += `
+      selector: "#element"`;
+      }
+      
+      return actionConfig;
+    }).join('\n');
+
+    return `# AutoGo 任务配置文件
+# 通过拖拽组件创建的任务配置
+
+- name: "自动化任务"
+  url: "https://example.com"
+  wait_time: 3
+  screenshot: true
+  actions:
+${yamlActions}`;
+  };
+
+  const yamlContent = generateYaml();
 
   // 复制到剪贴板
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(yamlOutput);
+      await navigator.clipboard.writeText(yamlContent);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
@@ -68,57 +107,18 @@ export function YamlPreview() {
         </button>
       </div>
 
-      {/* 验证状态 */}
-      {validation && (
-        <div className={`p-3 border-b border-slate-700 ${validation.valid ? 'bg-green-900/20' : 'bg-red-900/20'}`}>
-          <div className="flex items-center gap-2">
-            <AlertCircle className={`w-4 h-4 ${validation.valid ? 'text-green-400' : 'text-red-400'}`} />
-            <span className={`text-sm ${validation.valid ? 'text-green-400' : 'text-red-400'}`}>
-              {validation.valid ? '配置验证通过' : `发现 ${validation.errors.length} 个错误`}
-            </span>
-          </div>
-          {!validation.valid && validation.errors.length > 0 && (
-            <div className="mt-2 space-y-1">
-              {validation.errors.slice(0, 3).map((error, index) => (
-                <div key={index} className="text-xs text-red-300 ml-6">
-                  • {error}
-                </div>
-              ))}
-              {validation.errors.length > 3 && (
-                <div className="text-xs text-red-300 ml-6">
-                  ... 还有 {validation.errors.length - 3} 个错误
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      )}
-
       {/* 代码内容 */}
       <div className="flex-1 overflow-hidden">
-        {yamlOutput ? (
-          <pre className="h-full overflow-auto p-4 text-sm font-mono text-slate-300 bg-slate-950">
-            <code>{yamlOutput}</code>
-          </pre>
-        ) : (
-          <div className="h-full flex items-center justify-center">
-            <div className="text-center">
-              <FileText className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-              <div className="text-slate-400">暂无YAML内容</div>
-              <div className="text-slate-500 text-sm mt-1">
-                拖拽组件到画布开始创建配置
-              </div>
-            </div>
-          </div>
-        )}
+        <pre className="h-full overflow-auto p-4 text-sm font-mono text-slate-300 bg-slate-950">
+          <code>{yamlContent}</code>
+        </pre>
       </div>
 
       {/* 统计信息 */}
-      {tasks.length > 0 && (
+      {items.length > 0 && (
         <div className="p-3 border-t border-slate-700 bg-slate-800/50">
-          <div className="text-xs text-slate-400 space-y-1">
-            <div>任务数量: {tasks.length}</div>
-            <div>操作总数: {tasks.reduce((sum, task) => sum + (task.actions?.length || 0), 0)}</div>
+          <div className="text-xs text-slate-400">
+            <div>组件数量: {items.length}</div>
           </div>
         </div>
       )}
