@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef } from 'react';
-import { Upload, Download, Eye, EyeOff, Save, FileText, Trash2 } from 'lucide-react';
+import { Upload, Download, Eye, EyeOff, FileText, Trash2 } from 'lucide-react';
 import { useEditorStore } from '@/lib/store/editor-store';
 
 interface ToolbarProps {

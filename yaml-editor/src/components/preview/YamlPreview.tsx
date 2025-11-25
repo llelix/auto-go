@@ -14,9 +14,19 @@ export function YamlPreview() {
   useEffect(() => {
     if (tasks.length > 0) {
       const result = YamlParser.validateConfig(tasks);
-      setValidation(result);
+      // 使用 setTimeout 避免同步调用 setState
+      const timeoutId = setTimeout(() => {
+        setValidation(result);
+      }, 0);
+      
+      return () => clearTimeout(timeoutId);
     } else {
-      setValidation(null);
+      // 使用 setTimeout 避免同步调用 setState
+      const timeoutId = setTimeout(() => {
+        setValidation(null);
+      }, 0);
+      
+      return () => clearTimeout(timeoutId);
     }
   }, [tasks]);
 
